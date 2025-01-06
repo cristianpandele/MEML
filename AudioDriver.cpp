@@ -16,16 +16,25 @@ I2S AUDIO_MEM i2s(OUTPUT);
 const int AUDIO_MEM frequency = 200; // frequency of square wave in Hz
 const int AUDIO_MEM sampleRate = kSampleRate; // minimum for many i2s DACs
 const int AUDIO_MEM bitsPerSample = 32;
-const int AUDIO_MEM amplitude = 1 << (bitsPerSample - 2); // amplitude of square wave = 1/2 of maximum
+const float AUDIO_MEM amplitude = (1 << (bitsPerSample - 2)) - 1; // amplitude of square wave = 1/2 of maximum
+const float AUDIO_MEM neg_amplitude = -(amplitude);
 
 #define MCLK_MUL  256     // depends on audio hardware. Suits common hardware.
 
-const int AUDIO_MEM halfWavelength = sampleRate / (2 * frequency); // half wavelength of square wave
-
-int32_t AUDIO_MEM sample = amplitude; // current sample value
-int AUDIO_MEM count = 0;
 
 AudioControlSGTL5000 codecCtl;
+
+audiocallback_fptr_t audio_callback_;
+
+float _scale_and_saturate(float x) {
+    x *= amplitude;
+    if (x >= amplitude) {
+        x = amplitude;
+    } else if (x <= neg_amplitude) {
+        x = neg_amplitude;
+    }
+    return x;
+}
 
 void __isr AudioDriver_Output::i2sOutputCallback() {
     // Serial.println(i2s.availableForWrite());
@@ -34,24 +43,23 @@ void __isr AudioDriver_Output::i2sOutputCallback() {
     // Timing start
     auto ts = micros();
 
-    for(size_t i=0;  i < 64; i++) {
+    for(size_t i=0;  i < kBufferSize; i++) {
 
-        // while(i2s.availableForWrite() >1) {
-        if (count % halfWavelength == 0) {
-            // invert the sample every half wavelength count multiple to generate square wave
-            sample = -1 * sample;
-        }
+        stereosample_t y { 0 };
+        y = audio_callback_(y);
 
-        i2s.write32(sample, sample);
-
-        // increment the counter for the next sample
-        count++;
+        stereosample_t y_scaled {
+            _scale_and_saturate(y.L),
+            _scale_and_saturate(y.R),
+        };
+        i2s.write32(static_cast<int32_t>(y_scaled.L), static_cast<int32_t>(y_scaled.R));
     }
 
     // Timing end
     auto elapsed = micros() - ts;
     static constexpr float quantumLength = 1.f/
-            ((static_cast<float>(kBufferSize)/48000.f) * 1000000.f);
+            ((static_cast<float>(kBufferSize)/static_cast<float>(kSampleRate))
+            * 1000000.f);
     float dspload = elapsed * quantumLength;
     // Report DSP overload if needed
     static volatile bool dsp_overload = false;
@@ -63,6 +71,9 @@ void __isr AudioDriver_Output::i2sOutputCallback() {
 }
 
 bool AudioDriver_Output::Setup() {
+
+    audio_callback_ = &silence_;
+
     // pinMode(LED_BUILTIN, OUTPUT);
     // digitalWrite(LED_BUILTIN, 1);
     // Serial.begin(115200);
@@ -100,3 +111,10 @@ bool AudioDriver_Output::Setup() {
     return true;
 }
 
+
+stereosample_t AudioDriver_Output::silence_(stereosample_t x) {
+    x.L = 0;
+    x.R = 0;
+
+    return x;
+}
