@@ -31,11 +31,12 @@ void setup() {
 }
 
 void AUDIO_FUNC(loop)() {
-    uint32_t param;
-    queue_remove_blocking(&queue_audioparam, &param);
-    Serial.print("loop - Param: ");
-    Serial.println(param);
+    // uint32_t param;
+    // queue_remove_blocking(&queue_audioparam, &param);
+    // Serial.print("loop - Param: ");
+    // Serial.println(param);
 }
+
 
 void setup1() {
     // Init serial and signal other core
@@ -45,7 +46,7 @@ void setup1() {
     // Core INTERFACE routine setup
     queue_init(&queue_audioparam, sizeof(uint32_t), 32);
     // GPIO/ADC setup
-    ButtonsPots::Setup();
+    ButtonsPots::Setup(true);
 
     // Wait for init sync
     flag_init_1 = true;
@@ -55,13 +56,24 @@ void setup1() {
 }
 
 void loop1() {
-    static uint32_t counter = 0;
-    if (!queue_try_add(&queue_audioparam, &counter)) {
-        Serial.println("ERROR - Queue not ready.");
-    }
-    counter++;
+    static constexpr uint32_t period_ms = 1;
+    static constexpr float pulse_every_s = 1;
+    static constexpr float count_wraparound = (1000.f * pulse_every_s)
+            / static_cast<float>(period_ms);
+    static volatile float counter = 0;
+    // static uint32_t counter = 0;
+    // if (!queue_try_add(&queue_audioparam, &counter)) {
+    //     Serial.println("ERROR - Queue not ready.");
+    // }
+    // counter++;
 
     // Read ADC
     ButtonsPots::Process();
-    delay(1000);
+
+    counter++;
+    if (counter >= count_wraparound) {
+        counter = 0;
+        Serial.println(".");
+    }
+    delay(period_ms);
 }
