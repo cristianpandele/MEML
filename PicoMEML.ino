@@ -3,11 +3,15 @@
 #include "src/audio/AudioApp.hpp"
 #include "src/interface/ButtonsPots.hpp"
 #include "src/common/common_defs.h"
+#include "src/synth/FMSynth.hpp"
+#include "src/interface/MEMLInterface.hpp"
 
 #include <cstdint>
 #include "pico/util/queue.h"
 
 static queue_t queue_audioparam;
+static queue_t queue_interface_pulse;
+static queue_t queue_interface_midi;
 static bool flag_init_0 = false;
 static bool flag_init_1 = false;
 static bool flag_init_serial = false;
@@ -24,6 +28,15 @@ ts_app_state gAppState = {
     mode_inference,
     expl_mode_nnweights,
 };
+
+// Global objects
+MEMLInterface meml_interface(
+    &queue_audioparam,
+    &queue_interface_pulse,
+    &queue_interface_midi,
+    &FMSynth::GenParams,
+    kN_synthparams
+);
 
 
 void setup() {

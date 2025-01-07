@@ -13,9 +13,9 @@
 //#include "mlp_task.hpp"
 
 
-MEMLInterface::MEMLInterface(queue_t interface_fmsynth,
-                             queue_t interface_pulse,
-                             queue_t interface_midi,
+MEMLInterface::MEMLInterface(queue_t *interface_fmsynth,
+                             queue_t *interface_pulse,
+                             queue_t *interface_midi,
                              GenParamsFn_ptr_t gen_params_fn_ptr,
                              size_t nn_output_size) :
         joystick_inference_(true),
@@ -83,7 +83,7 @@ void MEMLInterface::SetPot(te_joystick_pot pot_n, num_t value)
 void MEMLInterface::SetPulse(int32_t pulse)
 {
     if (pulse_on_) {
-        queue_try_add(&interface_pulse_, &pulse);
+        queue_try_add(interface_pulse_, &pulse);
     }
 }
 void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
@@ -116,7 +116,7 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
 
                 // Send them down to fmsynth
                 queue_try_add(
-                    &interface_fmsynth_,
+                    interface_fmsynth_,
                     reinterpret_cast<void *>(rand_params.data())
                 );
 
@@ -203,7 +203,7 @@ void MEMLInterface::SendMIDI(ts_midi_note midi_note)
 {
     if (midi_on_) {
         queue_try_add(
-            &interface_midi_,
+            interface_midi_,
             reinterpret_cast<void *>(&midi_note)
         );
     }

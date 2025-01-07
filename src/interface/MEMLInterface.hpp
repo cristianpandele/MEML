@@ -12,9 +12,9 @@ class MEMLInterface {
 
     using GenParamsFn_ptr_t = void (*)(std::vector<float>&);
 
-    MEMLInterface(queue_t interface_fmsynth,
-                  queue_t interface_midi,
-                  queue_t interface_pulse,
+    MEMLInterface(queue_t *interface_fmsynth,
+                  queue_t *interface_midi,
+                  queue_t *interface_pulse,
                   GenParamsFn_ptr_t gen_params_fn_ptr,
                   size_t nn_output_size);
     void SetPot(te_joystick_pot pot_n, num_t value);
@@ -35,9 +35,9 @@ class MEMLInterface {
     } joystick_current_;
     std::vector<float> current_fmsynth_params_;
     // Channels for outside comms
-    queue_t interface_fmsynth_;
-    queue_t interface_midi_;
-    queue_t interface_pulse_;
+    queue_t *interface_fmsynth_;
+    queue_t *interface_midi_;
+    queue_t *interface_pulse_;
 
     GenParamsFn_ptr_t gen_params_fn_ptr_;
 
