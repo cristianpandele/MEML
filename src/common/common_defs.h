@@ -8,6 +8,8 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
+typedef float num_t;
+
 typedef struct {
     float potX;
     float potY;

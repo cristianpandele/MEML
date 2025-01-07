@@ -1,6 +1,7 @@
 #ifndef __PICO_DEFS_HPP__
 #define __PICO_DEFS_HPP__
 
+#include "common/common_defs.h"
 
 #define AUDIO_FUNC(x)    __not_in_flash_func(x)
 #define AUDIO_MEM    __not_in_flash("audio")
@@ -18,6 +19,9 @@ enum PinConfig {
     pot_JoystickY = 27,
     pot_JoystickZ = 28
 };
+
+
+extern ts_app_state gAppState;
 
 
 #endif  // __PICO_DEFS_HPP__

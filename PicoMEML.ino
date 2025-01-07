@@ -2,6 +2,7 @@
 #include "src/audio/AudioDriver.hpp"
 #include "src/audio/AudioApp.hpp"
 #include "src/interface/ButtonsPots.hpp"
+#include "src/common/common_defs.h"
 
 #include <cstdint>
 #include "pico/util/queue.h"
@@ -10,6 +11,20 @@ static queue_t queue_audioparam;
 static bool flag_init_0 = false;
 static bool flag_init_1 = false;
 static bool flag_init_serial = false;
+
+
+// Global app state
+ts_app_state gAppState = {
+    0,
+    0,
+    0,
+    app_id_fmsynth,
+    0,
+    0,
+    mode_inference,
+    expl_mode_nnweights,
+};
+
 
 void setup() {
     while (!flag_init_serial) {
