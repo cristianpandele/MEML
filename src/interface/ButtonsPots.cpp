@@ -131,10 +131,11 @@ void ButtonsPots::ButtonISR(void)
     for (unsigned int n = 0; n < kNButtons; n++) {
 
         // Debounce
+        static constexpr unsigned long debounce_ms = 20;
         static unsigned long last_interrupt_time = 0;
         unsigned long interrupt_time = millis();
         if (interrupt_time > last_interrupt_time
-                && interrupt_time - last_interrupt_time < 10) {
+                && interrupt_time - last_interrupt_time < debounce_ms) {
             last_interrupt_time = interrupt_time;
             return;  // Ignore bounce
         }
