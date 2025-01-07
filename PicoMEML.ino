@@ -1,5 +1,7 @@
-#include "PicoDefs.hpp"
-#include "AudioDriver.hpp"
+#include "src/PicoDefs.hpp"
+#include "src/audio/AudioDriver.hpp"
+#include "src/audio/AudioApp.hpp"
+#include "src/interface/ButtonsPots.hpp"
 
 #include <cstdint>
 #include "pico/util/queue.h"
@@ -7,13 +9,20 @@
 static queue_t queue_audioparam;
 static bool flag_init_0 = false;
 static bool flag_init_1 = false;
+static bool flag_init_serial = false;
 
 void setup() {
+    while (!flag_init_serial) {
+        // Wait for serial interface to be inited
+    };
+
     // AUDIO routine setup
     if (!AudioDriver_Output::Setup()) {
         Serial.println("setup - I2S init failed!");
     }
-    
+    AudioAppSetup();
+    // I2S callback is last
+    AudioDriver_Output::SetCallback(&AudioAppProcess);
     // Wait for init sync
     flag_init_0 = true;
     while (!flag_init_1) {
@@ -29,10 +38,14 @@ void AUDIO_FUNC(loop)() {
 }
 
 void setup1() {
+    // Init serial and signal other core
     Serial.begin();
+    flag_init_serial = true;
 
-    // INTERFACE routine setup
+    // Core INTERFACE routine setup
     queue_init(&queue_audioparam, sizeof(uint32_t), 32);
+    // GPIO/ADC setup
+    ButtonsPots::Setup();
 
     // Wait for init sync
     flag_init_1 = true;
@@ -47,5 +60,8 @@ void loop1() {
         Serial.println("ERROR - Queue not ready.");
     }
     counter++;
+
+    // Read ADC
+    ButtonsPots::Process();
     delay(1000);
 }

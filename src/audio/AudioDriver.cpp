@@ -1,5 +1,5 @@
 #include "AudioDriver.hpp"
-#include "PicoDefs.hpp"
+#include "../PicoDefs.hpp"
 
 #include "control_sgtl5000.h"
 #include <I2S.h>

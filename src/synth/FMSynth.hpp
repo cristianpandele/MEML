@@ -11,7 +11,7 @@
 
 #include "OnePoleSmoother.hpp"
 
-#include "common_defs.h"
+#include "../common/common_defs.h"
 
 const size_t kN_synthparams = 14;
 using synthparams_array = std::array<float, kN_synthparams>;
