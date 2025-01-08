@@ -1,0 +1,3 @@
+[submodule "src/mlp"]
+	path = src/mlp
+	url = git@github.com:MusicallyEmbodiedML/memlp.git
