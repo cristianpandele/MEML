@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include "pico/util/queue.h"
+#include "hardware/clocks.h"
 
 static queue_t queue_audioparam;
 static queue_t queue_interface_pulse;
@@ -17,6 +18,18 @@ static volatile bool flag_init_0 = false;
 static volatile bool flag_init_1 = false;
 
 const bool waitForSerialOnStart = true;
+
+uint32_t get_random_bits(int num_bits) {
+    uint32_t random_value = 0;
+
+    // Read RANDOMBIT num_bits times
+    for (int i = 0; i < num_bits; i++) {
+        // Shift the random value left by 1 and add the RANDOMBIT
+        random_value = (random_value << 1) | (rosc_hw->randombit & 0x1);
+    }
+
+    return random_value;
+}
 
 // Global app state
 ts_app_state gAppState = {
@@ -41,10 +54,18 @@ MEMLInterface meml_interface(
 
 
 void setup() {
+
+
     //wait for serial
     if (waitForSerialOnStart){
         while(!Serial) {;}
     }
+    uint32_t seed = get_random_bits(32);
+    // Print the generated seed
+    Serial.printf("Generated Random Seed: %u\n", seed);
+    // Seed the standard PRNG
+    srand(seed);
+
     // AUDIO routine setup
     if (!AudioDriver_Output::Setup()) {
         Serial.println("setup - I2S init failed!");

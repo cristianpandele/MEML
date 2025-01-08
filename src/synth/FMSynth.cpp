@@ -4,14 +4,6 @@
 #include <cstdlib>
 #include <vector>
 
-//extern "C" {
-//    #include <stdio.h>
-//}
-
-// #ifndef M_PI
-//     #define M_PI 3.14159265358979323846
-// #endif
-
 void FMSynth::GenParams(std::vector<float> &param_vector)
 {
 #if 0
@@ -30,6 +22,14 @@ void FMSynth::GenParams(std::vector<float> &param_vector)
     //printf("\n");
 }
 
+void FMSynth::UpdateParams() {
+    op1.UpdateParams();
+    op2.UpdateParams();
+    op3.UpdateParams();
+    op4.UpdateParams();
+    
+}
+
 FMSynth::FMSynth(float sample_rate) :
     smoother_(100.f, sample_rate),
     envelope_smoother_(10.f, sample_rate),
@@ -38,20 +38,14 @@ FMSynth::FMSynth(float sample_rate) :
     play_note_(false),
     midi_enabled_(true)
 {
-    std::srand(0);
-    // w_ = 2.f * M_PI * freq_ / sample_rate_;
-    // phase_ = 0;
-
+    // std::srand(0);
     maxiSettings::setup(sample_rate, 1, 16);
-    std::vector<FMOperator> ops { op1, op2, op3, op4 };
-    for (auto &op : ops) {
-        op.UpdateParams();
-    }
-
+    UpdateParams();
     std::vector<float> randParams(kN_synthparams);
     GenParams(randParams);
 
     mapParameters(randParams);
+    
 }
 
 void FMSynth::mapParameters(std::vector<float> &params) {
@@ -100,7 +94,8 @@ inline float midiNoteToFrequency(int midiNote) {
     // Calculate the frequency
     return A440 * std::pow(SEMITONE_RATIO, semitoneOffset);
 }
-
+size_t sampleIdx=0;
+maxiOsc tmposc;
 float FMSynth::process()
 {
     // Smooth all parameters before using them
@@ -143,6 +138,11 @@ float FMSynth::process()
         synthparams_smoothed[8], synthparams_smoothed[9]);
 
     float y = (w + w2) * envelope;
+
+    // float y = op1.play(500,1, 1);
+    // if (sampleIdx++ %1000 == 0) {
+    //     Serial.println(y);
+    // }
 
     return std::tanh(y);
 #else

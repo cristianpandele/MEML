@@ -6,7 +6,8 @@
 extern "C" {
 
 const size_t kBufferSize = 64;
-const size_t kSampleRate = 48000;
+constexpr size_t kSampleRate = 48000;
+constexpr float kSampleRateRcpr = 1.0/kSampleRate;
 
 typedef struct {
     float L;

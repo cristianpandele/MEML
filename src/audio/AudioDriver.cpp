@@ -41,6 +41,9 @@ inline float AUDIO_FUNC(_scale_and_saturate)(float x) {
 
 
 static void AUDIO_FUNC(process_audio)(const int32_t* input, int32_t* output, size_t num_frames) {
+    // Timing start
+    auto ts = micros();
+
     stereosample_t y { 0 };
     for (size_t i = 0; i < num_frames; i++) {
 
@@ -78,6 +81,22 @@ static void AUDIO_FUNC(process_audio)(const int32_t* input, int32_t* output, siz
         //   f2 = 20.0;
         // }
 
+
+
+    }
+    // Timing end
+    auto elapsed = micros() - ts;
+    static constexpr float quantumLength = 1.f/
+            ((static_cast<float>(kBufferSize)/static_cast<float>(kSampleRate))
+            * 1000000.f);
+    float dspload = elapsed * quantumLength;
+    // Serial.println(dspload);
+    // Report DSP overload if needed
+    static volatile bool dsp_overload = false;
+    if (dspload > 0.95 and !dsp_overload) {
+        dsp_overload = true;
+    } else if (dspload < 0.9) {
+        dsp_overload = false;
     }
 }
 
@@ -99,8 +118,6 @@ static void __isr dma_i2s_in_handler(void) {
 
 void __isr AudioDriver_Output::i2sOutputCallback() {
 
-    // Timing start
-    // auto ts = micros();
 
     // for(size_t i=0;  i < kBufferSize; i++) {
 

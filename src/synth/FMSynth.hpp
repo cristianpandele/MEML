@@ -1,5 +1,6 @@
 #ifndef _FM_HPP
 #define _FM_HPP
+#include <Arduino.h>
 
 #include <cstdint>
 
@@ -123,6 +124,7 @@ class FMSynth {
     void mapParameters(std::vector<float> &params);
     void EnableMIDI(bool en);
     void AddMIDINote(ts_midi_note note);
+    void UpdateParams();
 
  private:
     FMOperator op1, op2, op3, op4;

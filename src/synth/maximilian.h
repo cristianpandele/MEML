@@ -104,6 +104,7 @@ public:
  
 class maxiOsc
 {
+public:
 
     //float frequency;
     float phase;
@@ -113,7 +114,6 @@ class maxiOsc
     //float tri;
     float constant_by_one_over_sr_;
 
-public:
     maxiOsc();
     void UpdateParams(void);
     /*!Square wave oscillator
