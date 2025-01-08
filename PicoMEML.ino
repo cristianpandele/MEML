@@ -20,14 +20,14 @@ const bool waitForSerialOnStart = true;
 
 // Global app state
 ts_app_state gAppState = {
-    0,
-    0,
-    0,
-    app_id_fmsynth,
-    0,
-    0,
-    mode_inference,
-    expl_mode_nnweights,
+    .n_iterations = 500,
+    .last_error = 0.0f,
+    .exploration_range = 0.0f,
+    .app_id = app_id_fmsynth,
+    .current_dataset = 0,
+    .current_model = 0,
+    .current_nn_mode = mode_inference,
+    .current_expl_mode = expl_mode_nnweights
 };
 
 // Global objects
@@ -107,13 +107,12 @@ void setup1() {
 }
 
 void loop1() {
-
     // Read ADC
     ButtonsPots::Process();
 
-    // Pulse
-#if 0
     static constexpr uint32_t period_ms = 1;
+    // Pulse
+#if 1
     static constexpr float pulse_every_s = 1;
     static constexpr float count_wraparound = (1000.f * pulse_every_s)
             / static_cast<float>(period_ms);
@@ -123,6 +122,7 @@ void loop1() {
         counter = 0;
         Serial.println(".");
     }
-    delay(period_ms);
 #endif
+
+    delay(period_ms);
 }

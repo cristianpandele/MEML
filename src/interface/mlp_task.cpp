@@ -2,6 +2,7 @@
 #include "../mlp/MLP.h"
 #include "../mlp/Data.h"
 #include "../mlp/Dataset.hpp"
+#include "../utils/PrintVector.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -107,6 +108,7 @@ void mlp_train()
 
     MLP<float>::training_pair_t dataset(dataset_[ds_n_]->GetFeatures(), dataset_[ds_n_]->GetLabels());
 
+    // Check and report on dataset size
     Serial.print("MLP- Feature size ");
     Serial.print(dataset.first.size());
     Serial.print(", label size ");
@@ -121,6 +123,8 @@ void mlp_train()
     if (!dataset.first[0].size() || !dataset.second[0].size()) {
         return;
     }
+
+    // Train!
     Serial.print("MLP- Training for max ");
     Serial.print(gAppState.n_iterations);
     Serial.println(" iterations...");
@@ -130,7 +134,7 @@ void mlp_train()
               0.0001,
               false);
     Serial.print("MLP- Trained, loss = ");
-    Serial.println(loss);
+    Serial.println(loss, 10);
 
     mlp_save_all_();
 
