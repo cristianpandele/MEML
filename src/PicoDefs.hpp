@@ -3,6 +3,8 @@
 
 #include "common/common_defs.h"
 
+#include "interface/MEMLInterface.hpp"
+
 #define AUDIO_FUNC(x)    __not_in_flash_func(x)
 #define AUDIO_MEM    __not_in_flash("audio")
 
@@ -21,7 +23,9 @@ enum PinConfig {
 };
 
 
+// Global objects
 extern ts_app_state gAppState;
+extern MEMLInterface meml_interface;
 
 
 #endif  // __PICO_DEFS_HPP__

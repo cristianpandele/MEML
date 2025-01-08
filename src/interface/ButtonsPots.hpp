@@ -31,8 +31,8 @@ class ButtonsPots {
  protected:
 
     static void ButtonISR(void);
-    static void ProcessButton_(PinConfig pin_n,
-                               size_t n,
+    static void ProcessButton_(const PinConfig pin_n,
+                               const size_t n,
                                bool button_current_state);
 };
 

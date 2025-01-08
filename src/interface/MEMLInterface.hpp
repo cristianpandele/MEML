@@ -18,6 +18,7 @@ class MEMLInterface {
                   GenParamsFn_ptr_t gen_params_fn_ptr,
                   size_t nn_output_size);
     void SetPot(te_joystick_pot pot_n, num_t value);
+    void UpdatePots(void);
     void SetToggleButton(te_button_idx button_n, int8_t state);
     void SetSlider(te_slider_idx idx, num_t value);
     void SendMIDI(ts_midi_note midi_note);

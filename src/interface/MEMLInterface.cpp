@@ -72,9 +72,11 @@ void MEMLInterface::SetPot(te_joystick_pot pot_n, num_t value)
         value = 1.0;
     }
     joystick_current_.as_array[pot_n] = value;
+}
 
+void MEMLInterface::UpdatePots()
+{
     // If inference, run inference here
-    //if (gAppState.current_nn_mode== mode_inference) {
     if (joystick_inference_) {
         //mlp_inference_nochannel(joystick_current_.as_struct);
     }
