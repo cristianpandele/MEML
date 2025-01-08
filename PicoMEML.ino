@@ -12,10 +12,10 @@
 static queue_t queue_audioparam;
 static queue_t queue_interface_pulse;
 static queue_t queue_interface_midi;
-static bool flag_init_0 = false;
-static bool flag_init_1 = false;
-static bool flag_init_serial = false;
+static volatile bool flag_init_0 = false;
+static volatile bool flag_init_1 = false;
 
+const bool waitForSerialOnStart = true;
 
 // Global app state
 ts_app_state gAppState = {
@@ -40,10 +40,10 @@ MEMLInterface meml_interface(
 
 
 void setup() {
-    while (!flag_init_serial) {
-        // Wait for serial interface to be inited
-    };
-
+    //wait for serial
+    if (waitForSerialOnStart){
+        while(!Serial) {;}
+    }
     // AUDIO routine setup
     if (!AudioDriver_Output::Setup()) {
         Serial.println("setup - I2S init failed!");
@@ -68,9 +68,9 @@ void AUDIO_FUNC(loop)() {
 
 void setup1() {
     // Init serial and signal other core
-    Serial.begin();
-    flag_init_serial = true;
-
+    if (waitForSerialOnStart){
+        while(!Serial) {;}
+    }
     // Core INTERFACE routine setup
     queue_init(&queue_audioparam, sizeof(uint32_t), 32);
     // GPIO/ADC setup

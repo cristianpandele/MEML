@@ -5,7 +5,7 @@
 
 
 //static FMSynth fm_synth_(kSampleRate);
-static SineTone sine_tone_(kSampleRate, 440.f);
+static SineTone sine_tone_(kSampleRate, 200.f);
 
 
 void AudioAppSetup(void)
