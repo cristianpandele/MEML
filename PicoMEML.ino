@@ -5,6 +5,7 @@
 #include "src/common/common_defs.h"
 #include "src/synth/FMSynth.hpp"
 #include "src/interface/MEMLInterface.hpp"
+#include "src/interface/mlp_task.hpp"
 
 #include <cstdint>
 #include "pico/util/queue.h"
@@ -59,10 +60,27 @@ void setup() {
 }
 
 void AUDIO_FUNC(loop)() {
-    // uint32_t param;
-    // queue_remove_blocking(&queue_audioparam, &param);
-    // Serial.print("loop - Param: ");
-    // Serial.println(param);
+
+    {
+        float audio_params[kN_synthparams];
+        if (queue_try_remove(&queue_audioparam, audio_params)) {
+            Serial.println("A- Audio params received.");
+        }
+    }
+
+    {
+        float pulse;
+        if (queue_try_remove(&queue_interface_pulse, &pulse)) {
+            Serial.println("A- Pulse received.");
+        }
+    }
+
+    {
+        ts_midi_note midi;
+        if (queue_try_remove(&queue_interface_midi, &midi)) {
+            Serial.println("A- MIDI received.");
+        }
+    }
 }
 
 
@@ -71,10 +89,15 @@ void setup1() {
     Serial.begin();
     flag_init_serial = true;
 
-    // Core INTERFACE routine setup
-    queue_init(&queue_audioparam, sizeof(uint32_t), 32);
+    // Core QUEUE setup (imitating channels)
+    queue_init(&queue_audioparam, sizeof(float)*kN_synthparams, 1);
+    queue_init(&queue_interface_pulse, sizeof(float), 1);
+    queue_init(&queue_interface_midi, sizeof(ts_midi_note), 1);
+    
     // GPIO/ADC setup
     ButtonsPots::Setup(true);
+    // MLP setup
+    mlp_init(&queue_audioparam, kN_synthparams);
 
     // Wait for init sync
     flag_init_1 = true;
@@ -84,24 +107,22 @@ void setup1() {
 }
 
 void loop1() {
+
+    // Read ADC
+    ButtonsPots::Process();
+
+    // Pulse
+#if 0
     static constexpr uint32_t period_ms = 1;
     static constexpr float pulse_every_s = 1;
     static constexpr float count_wraparound = (1000.f * pulse_every_s)
             / static_cast<float>(period_ms);
     static volatile float counter = 0;
-    // static uint32_t counter = 0;
-    // if (!queue_try_add(&queue_audioparam, &counter)) {
-    //     Serial.println("ERROR - Queue not ready.");
-    // }
-    // counter++;
-
-    // Read ADC
-    ButtonsPots::Process();
-
     counter++;
     if (counter >= count_wraparound) {
         counter = 0;
         Serial.println(".");
     }
     delay(period_ms);
+#endif
 }

@@ -10,7 +10,7 @@
 #include "Arduino.h"
 
 // Internal C++ includes
-//#include "mlp_task.hpp"
+#include "mlp_task.hpp"
 
 
 MEMLInterface::MEMLInterface(queue_t *interface_fmsynth,
@@ -47,8 +47,8 @@ void MEMLInterface::SetSlider(te_slider_idx idx, num_t value)
             gAppState.exploration_range = value;
             // TODO deprecate those local values!!!
             draw_speed_ = value;
-            //mlp_set_speed(draw_speed_);
-            //mlp_inference_nochannel(joystick_current_.as_struct);
+            mlp_set_speed(draw_speed_);
+            mlp_inference_nochannel(joystick_current_.as_struct);
         } break;
 
         case slider_nIterations: {
@@ -78,7 +78,7 @@ void MEMLInterface::UpdatePots()
 {
     // If inference, run inference here
     if (joystick_inference_) {
-        //mlp_inference_nochannel(joystick_current_.as_struct);
+        mlp_inference_nochannel(joystick_current_.as_struct);
     }
 }
 
@@ -94,8 +94,8 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
 
         case toggle_training: {
             if (state == mode_inference && gAppState.current_nn_mode == mode_training) {
-                //mlp_train();
-                //mlp_inference_nochannel(joystick_current_.as_struct);
+                mlp_train();
+                mlp_inference_nochannel(joystick_current_.as_struct);
             }
             gAppState.current_nn_mode = static_cast<te_nn_mode>(state);
             std::string dbg_mode(( gAppState.current_nn_mode == mode_training ) ? "training" : "inference");
@@ -126,8 +126,8 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
                 current_fmsynth_params_ = std::move(rand_params);
                 Serial.println("INTF- Random params");
 #else
-                //mlp_draw(draw_speed_);
-                //mlp_inference_nochannel(joystick_current_.as_struct);
+                mlp_draw(draw_speed_);
+                mlp_inference_nochannel(joystick_current_.as_struct);
 #endif
             }
         } break;
@@ -138,7 +138,7 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
                     joystick_inference_ = false;
                     Serial.println("INTF- Move the joystick to where you want it...");
                 } else {  // Button released/toggle off
-                    if (false) { //if (mlp_stored_output.size() > 0) {
+                    if (mlp_stored_output.size() > 0) {
                         // Save data point
                         std::vector<num_t> input{
                             joystick_current_.as_struct.potX,
@@ -146,9 +146,9 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
                             joystick_current_.as_struct.potRotate,
                             1.f  // bias
                         };
-                        // mlp_add_data_point(
-                        //     input, mlp_stored_output
-                        // );
+                        mlp_add_data_point(
+                            input, mlp_stored_output
+                        );
                         Serial.println("INTF- Saved data point");
                     } else {
                         Serial.println("INTF- Data point skipped");
@@ -159,12 +159,12 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
         } break;
 
         case button_cleardata: {
-            //mlp_clear_data();
+            mlp_clear_data();
         } break;
 
         case button_clearmodel: {
-            //mlp_clear_model();
-            //mlp_inference_nochannel(joystick_current_.as_struct);
+            mlp_clear_model();
+            mlp_inference_nochannel(joystick_current_.as_struct);
         } break;
 
         case toggle_explmode: {
@@ -185,16 +185,16 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
             Serial.print("INTF- Exploration_mode '");
             Serial.print(dbg_expl_mode.c_str());
             Serial.println("'.");
-            //mlp_set_expl_mode(expl_mode);
+            mlp_set_expl_mode(expl_mode);
         } break;
 
         case toggle_dataset: {
-            //mlp_set_dataset_idx(state);
+            mlp_set_dataset_idx(state);
         } break;
 
         case toggle_model: {
-            //mlp_set_model_idx(state);
-            //mlp_inference_nochannel(joystick_current_.as_struct);
+            mlp_set_model_idx(state);
+            mlp_inference_nochannel(joystick_current_.as_struct);
         } break;
 
         default: {}
