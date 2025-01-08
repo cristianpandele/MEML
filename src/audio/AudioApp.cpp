@@ -34,3 +34,8 @@ stereosample_t AudioAppProcess(stereosample_t y)
 
     return y;
 }
+
+void AudioAppSetParams(std::vector<float> &params)
+{
+    fm_synth_.mapParameters(params);
+}

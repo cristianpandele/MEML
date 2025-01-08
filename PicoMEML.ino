@@ -8,6 +8,7 @@
 #include "src/interface/mlp_task.hpp"
 
 #include <cstdint>
+#include <vector>
 #include "pico/util/queue.h"
 #include "hardware/clocks.h"
 
@@ -83,9 +84,10 @@ void setup() {
 void AUDIO_FUNC(loop)() {
 
     {
-        float audio_params[kN_synthparams];
-        if (queue_try_remove(&queue_audioparam, audio_params)) {
+        std::vector<float> audio_params(kN_synthparams);
+        if (queue_try_remove(&queue_audioparam, audio_params.data())) {
             Serial.println("A- Audio params received.");
+            AudioAppSetParams(audio_params);
         }
     }
 
