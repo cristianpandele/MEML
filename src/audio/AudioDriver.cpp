@@ -160,15 +160,14 @@ bool AudioDriver_Output::Setup() {
     i2s_config picoI2SConfig = i2s_config_default;
     picoI2SConfig.fs = sampleRate;
     picoI2SConfig.bit_depth = bitsPerSample;
-    picoI2SConfig.sck_mult=512;
+    picoI2SConfig.sck_mult=256;
     i2s_program_start_synched(pio0, &picoI2SConfig, dma_i2s_in_handler, &i2s);
 
     // init i2c
     codecCtl.enable();
-    codecCtl.volume(1);
+    codecCtl.volume(0.5);
     codecCtl.inputSelect(AUDIO_INPUT_LINEIN);
-    codecCtl.lineInLevel(0);
-    codecCtl.audioProcessorDisable();
+    codecCtl.lineInLevel(7);
 
 
     return true;
