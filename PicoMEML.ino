@@ -63,7 +63,7 @@ void setup() {
     }
     uint32_t seed = get_random_bits(32);
     // Print the generated seed
-    Serial.printf("Generated Random Seed: %u\n", seed);
+    //Serial.printf("Generated Random Seed: %u\n", seed);
     // Seed the standard PRNG
     srand(seed);
 

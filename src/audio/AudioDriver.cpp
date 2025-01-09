@@ -25,9 +25,9 @@ audiocallback_fptr_t audio_callback_;
 
 static __attribute__((aligned(8))) pio_i2s i2s;
 
-maxiOsc osc, osc2;
+// maxiOsc osc, osc2;
 
-float f1=20, f2=2000;
+// float f1=20, f2=2000;
 
 inline float AUDIO_FUNC(_scale_and_saturate)(float x) {
     x *= amplitude;
@@ -165,7 +165,7 @@ bool AudioDriver_Output::Setup() {
 
     // init i2c
     codecCtl.enable();
-    codecCtl.volume(0.5);
+    codecCtl.volume(0.99);
     codecCtl.inputSelect(AUDIO_INPUT_LINEIN);
     codecCtl.lineInLevel(7);
 
