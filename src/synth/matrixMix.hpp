@@ -169,8 +169,6 @@ public:
         for(size_t i=0; i < params.size(); i++) {
             unsmoothParams[i] = newparams[i];
         }
-        Serial.print("Filter param: ");
-        Serial.println(unsmoothParams[17]);
         filt.set(maxiBiquad::filterTypes::HIGHPASS, unsmoothParams[17] * 5000.f, 2, 1);
 
 

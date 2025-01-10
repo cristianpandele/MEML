@@ -32,17 +32,8 @@ stereosample_t AudioAppProcess(stereosample_t y)
     y.L = fm_synth_.process();
     y.R = y.L;
 #elif FX_PROCESSOR
-    static int counter = 0;
-    if (counter >= 48000) {
-        Serial.print(y.L);
-        Serial.print(" -> ");
-    }
     y.L = multi_fx_app_.play(y.L);
     y.R = y.L;
-    if (counter++ >= 48000) {
-        Serial.println(y.L);
-        counter = 0;
-    }
 #endif // FM_SYNTH
 
     return y;
