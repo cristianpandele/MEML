@@ -3,7 +3,11 @@
 #include "src/audio/AudioApp.hpp"
 #include "src/interface/ButtonsPots.hpp"
 #include "src/common/common_defs.h"
+#if FM_SYNTH
 #include "src/synth/FMSynth.hpp"
+#elif FX_PROCESSOR
+#include "src/synth/matrixMix.hpp"
+#endif  // FM_SYNTH
 #include "src/interface/MEMLInterface.hpp"
 #include "src/interface/mlp_task.hpp"
 
@@ -49,8 +53,12 @@ MEMLInterface meml_interface(
     &queue_audioparam,
     &queue_interface_pulse,
     &queue_interface_midi,
+#if FM_SYNTH
     &FMSynth::GenParams,
+#elif FX_PROCESSOR
+    &MaxtrixMixApp::GenParams,
     kN_synthparams
+#endif  // FM_SYNTH
 );
 
 

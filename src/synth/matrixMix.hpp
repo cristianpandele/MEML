@@ -121,11 +121,6 @@ public:
     float play(float x) {
         smoother_.Process(unsmoothParams.data(), params.data());
 
-        // float flange = flanger.flange(x, params[3] * 6000 + 100, params[4] * 0.98, params[5] * 10.f, params[6]) * params[1];
-        // float dist = distortion.fastAtanDist(x, params[7] * 10.0) * params[2] * 0.5;
-        // float delayed = dl.play(x, params[8] * 10000 + 100, params[9] * 0.99) * params[0];
-        // x = (flange + dist + delayed);
-        // return x;
         mmix.set(params);
         const size_t ofs = NFX*NFX; //offset from mixer params
         fxInputs[0] = x * params[ofs+0] * params[ofs+0];
@@ -159,10 +154,10 @@ public:
         float rmInput = (mmix.calculateMix(fxOutputs, 3) + fxInputs[3]) * 0.5;
         float rmSig = rmInput * rmMod;
         
-        fxOutputs[0] = 0;//flange;
-        fxOutputs[1] = 0;//filtered;
+        fxOutputs[0] = flange;
+        fxOutputs[1] = filtered;
         fxOutputs[2] = delayed;
-        fxOutputs[3] = 0;//rmSig;
+        fxOutputs[3] = rmSig;
 
         // x = fxOutputs[0] + fxOutputs[1] + fxOutputs[2];
         x = fxOutputs[0] + fxOutputs[1] + fxOutputs[2] + fxOutputs[3];
@@ -174,6 +169,8 @@ public:
         for(size_t i=0; i < params.size(); i++) {
             unsmoothParams[i] = newparams[i];
         }
+        Serial.print("Filter param: ");
+        Serial.println(unsmoothParams[17]);
         filt.set(maxiBiquad::filterTypes::HIGHPASS, unsmoothParams[17] * 5000.f, 2, 1);
 
 
