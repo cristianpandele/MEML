@@ -119,6 +119,9 @@ void setup1() {
     queue_init(&queue_interface_midi, sizeof(ts_midi_note), 1);
     // GPIO/ADC setup
     ButtonsPots::Setup(true);
+    for (auto &out_pin : { led_Training, led_MIDI }) {
+        pinMode(out_pin, OUTPUT);
+    }
     // MLP setup
     mlp_init(&queue_audioparam, kN_synthparams);
 

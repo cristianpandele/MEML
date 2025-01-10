@@ -88,6 +88,7 @@ void MEMLInterface::SetPulse(int32_t pulse)
         queue_try_add(interface_pulse_, &pulse);
     }
 }
+
 void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
 {
     switch(button_n) {
@@ -98,6 +99,8 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
                 mlp_inference_nochannel(joystick_current_.as_struct);
             }
             gAppState.current_nn_mode = static_cast<te_nn_mode>(state);
+            // Set the LED
+            digitalWrite(led_Training, gAppState.current_nn_mode);
             std::string dbg_mode(( gAppState.current_nn_mode == mode_training ) ? "training" : "inference");
             Serial.print("INTF- Mode: ");
             Serial.println(dbg_mode.c_str());

@@ -1,6 +1,7 @@
 #include "AudioDriver.hpp"
 #include "../PicoDefs.hpp"
-#include <Arduino.h> 
+#include <Arduino.h>
+#include "Wire.h"
 
 #include "control_sgtl5000.h"
 #include "i2s_pio/i2s.h"
@@ -9,15 +10,16 @@
 #include "hardware/clocks.h"
 
 
-#define FAST_MEM __not_in_flash("mydata")
+#define TEST_TONES    0
 
-const int FAST_MEM sampleRate = 48000; // minimum for many i2s DACs
-const int FAST_MEM bitsPerSample = 32;
 
-const float FAST_MEM amplitude = 1 << (bitsPerSample - 2); // amplitude of square wave = 1/2 of maximum
-const float FAST_MEM neg_amplitude = -amplitude; // amplitude of square wave = 1/2 of maximum
+const int AUDIO_MEM sampleRate = kSampleRate; // minimum for many i2s DACs
+const int AUDIO_MEM bitsPerSample = 32;
 
-int32_t FAST_MEM sample = amplitude; // current sample value
+const float AUDIO_MEM amplitude = 1 << (bitsPerSample - 2); // amplitude of square wave = 1/2 of maximum
+const float AUDIO_MEM neg_amplitude = -amplitude; // amplitude of square wave = 1/2 of maximum
+
+int32_t AUDIO_MEM sample = amplitude; // current sample value
 
 AudioControlSGTL5000 codecCtl;
 
@@ -25,9 +27,12 @@ audiocallback_fptr_t audio_callback_;
 
 static __attribute__((aligned(8))) pio_i2s i2s;
 
-// maxiOsc osc, osc2;
 
-// float f1=20, f2=2000;
+#if TEST_TONES
+maxiOsc osc, osc2;
+
+float f1=20, f2=2000;
+#endif  // TEST_TONES
 
 inline float AUDIO_FUNC(_scale_and_saturate)(float x) {
     x *= amplitude;
@@ -47,6 +52,7 @@ static void AUDIO_FUNC(process_audio)(const int32_t* input, int32_t* output, siz
     stereosample_t y { 0 };
     for (size_t i = 0; i < num_frames; i++) {
 
+#if !(TEST_TONES)
         y = audio_callback_(y);
 
         stereosample_t y_scaled {
@@ -68,20 +74,20 @@ static void AUDIO_FUNC(process_audio)(const int32_t* input, int32_t* output, siz
         //   // invert the sample every half wavelength count multiple to generate square wave
         //   sample = -1 * sample;
         // }
+#else
 
-        // output[i*2] = osc.sinewave(f1) * sample;
-        // output[(i*2) + 1] = osc2.sinewave(f2) * sample;
-        // // count++;
-        // f1 *= 1.00001;
-        // f2 *= 1.00001;
-        // if (f1 > 15000) {
-        //   f1 = 20.0;
-        // }
-        // if (f2 > 15000) {
-        //   f2 = 20.0;
-        // }
-
-
+        output[i*2] = osc.sinewave(f1) * sample;
+        output[(i*2) + 1] = osc2.sinewave(f2) * sample;
+        // count++;
+        f1 *= 1.00001;
+        f2 *= 1.00001;
+        if (f1 > 15000) {
+          f1 = 20.0;
+        }
+        if (f2 > 15000) {
+          f2 = 20.0;
+        }
+#endif  // TEST_TONES
 
     }
     // Timing end
@@ -150,17 +156,27 @@ bool AudioDriver_Output::Setup() {
 
     audio_callback_ = &silence_;
 
-    maxiSettings::setup(48000, 2, 64);
+    maxiSettings::setup(kSampleRate, 2, kBufferSize);
 
+    if (!Wire.setSDA(i2c_sgt5000Data) ||
+            !Wire.setSCL(i2c_sgt5000Clk)) {
+        Serial.println("AUDIO- Failed to setup I2C with codec!");
+    }
 
     set_sys_clock_khz(132000, true);
     // set_sys_clock_khz(129600, true);
     Serial.printf("System Clock: %lu\n", clock_get_hz(clk_sys));
 
-    i2s_config picoI2SConfig = i2s_config_default;
-    picoI2SConfig.fs = sampleRate;
-    picoI2SConfig.bit_depth = bitsPerSample;
-    picoI2SConfig.sck_mult=256;
+    i2s_config picoI2SConfig {
+        kSampleRate, // 48000,
+        256,
+        bitsPerSample, // 32,
+        i2s_pMCLK, // 10,
+        i2s_pDIN,  // 6,
+        i2s_pDOUT,  // 7,
+        i2s_pBCLK, // 8,
+        true
+    };
     i2s_program_start_synched(pio0, &picoI2SConfig, dma_i2s_in_handler, &i2s);
 
     // init i2c
