@@ -6,8 +6,8 @@
 
 
 // Select which example app to run
-#define FM_SYNTH         1
-#define FX_PROCESSOR     0
+#define FM_SYNTH         0
+#define FX_PROCESSOR     1
 
 
 #define AUDIO_FUNC(x)    __not_in_flash_func(x)

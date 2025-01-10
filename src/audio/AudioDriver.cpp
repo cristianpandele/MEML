@@ -11,6 +11,7 @@
 
 
 #define TEST_TONES    0
+#define PASSTHROUGH   0
 
 
 const int AUDIO_MEM sampleRate = kSampleRate; // minimum for many i2s DACs
@@ -18,6 +19,7 @@ const int AUDIO_MEM bitsPerSample = 32;
 
 const float AUDIO_MEM amplitude = 1 << (bitsPerSample - 2); // amplitude of square wave = 1/2 of maximum
 const float AUDIO_MEM neg_amplitude = -amplitude; // amplitude of square wave = 1/2 of maximum
+const float AUDIO_MEM one_over_amplitude = 1.f / amplitude;
 
 int32_t AUDIO_MEM sample = amplitude; // current sample value
 
@@ -44,15 +46,25 @@ inline float AUDIO_FUNC(_scale_and_saturate)(float x) {
     return x;
 }
 
+inline float AUDIO_FUNC(_scale_down)(float x) {
+    return x * one_over_amplitude;
+}
+
 
 static void AUDIO_FUNC(process_audio)(const int32_t* input, int32_t* output, size_t num_frames) {
     // Timing start
     auto ts = micros();
 
-    stereosample_t y { 0 };
     for (size_t i = 0; i < num_frames; i++) {
+    
+    stereosample_t y { 
+        _scale_down(static_cast<float>(input[i*2])),
+        _scale_down(static_cast<float>(input[i*2 + 1]))
+    };
 
 #if !(TEST_TONES)
+
+#if !(PASSTHROUGH)
         y = audio_callback_(y);
 
         stereosample_t y_scaled {
@@ -61,19 +73,14 @@ static void AUDIO_FUNC(process_audio)(const int32_t* input, int32_t* output, siz
         };
         output[i*2] = static_cast<int32_t>(y_scaled.L);
         output[(i*2) + 1] = static_cast<int32_t>(y_scaled.R);
+#else
 
         // output[i] = input[i];
 
-        // output[i*2] = input[i*2];
-        // output[(i*2) + 1] = input[(i*2) + 1];
+        output[i*2] = input[i*2];
+         output[(i*2) + 1] = input[(i*2) + 1];
+#endif  // PASSTHROUGH
 
-        // output[i*2] = 0;
-        // output[(i*2) + 1] = 0;
-
-        // if (count % halfWavelength == 0) {
-        //   // invert the sample every half wavelength count multiple to generate square wave
-        //   sample = -1 * sample;
-        // }
 #else
 
         output[i*2] = osc.sinewave(f1) * sample;
@@ -181,7 +188,7 @@ bool AudioDriver_Output::Setup() {
 
     // init i2c
     codecCtl.enable();
-    codecCtl.volume(0.99);
+    codecCtl.volume(0.8);
     codecCtl.inputSelect(AUDIO_INPUT_LINEIN);
     codecCtl.lineInLevel(7);
 

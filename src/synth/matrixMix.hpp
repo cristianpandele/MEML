@@ -158,11 +158,11 @@ public:
         float rmMod = sinosc.sinebuf(1.f + (params[ofs+11] * params[ofs+11] * 800));
         float rmInput = (mmix.calculateMix(fxOutputs, 3) + fxInputs[3]) * 0.5;
         float rmSig = rmInput * rmMod;
-
-        fxOutputs[0] = flange;
-        fxOutputs[1] = filtered;
+        
+        fxOutputs[0] = 0;//flange;
+        fxOutputs[1] = 0;//filtered;
         fxOutputs[2] = delayed;
-        fxOutputs[3] = rmSig;
+        fxOutputs[3] = 0;//rmSig;
 
         // x = fxOutputs[0] + fxOutputs[1] + fxOutputs[2];
         x = fxOutputs[0] + fxOutputs[1] + fxOutputs[2] + fxOutputs[3];
