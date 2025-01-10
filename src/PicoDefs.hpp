@@ -29,6 +29,8 @@ enum PinConfig {
     toggle_Training = 15,
     button_ClearData = 16,
     led_MIDI = 21,
+    button_ZoomOut = 18,
+    button_ZoomIn = 19,
     pot_JoystickX = 26,
     pot_JoystickY = 27,
     pot_JoystickZ = 28

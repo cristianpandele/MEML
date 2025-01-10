@@ -19,6 +19,8 @@ class ButtonsPots {
         button_Randomise,
         toggle_Training,
         button_ClearData,
+        button_ZoomOut,
+        button_ZoomIn
     };
     static constexpr size_t kNButtons = sizeof(Buttons)/sizeof(PinConfig);
     static constexpr enum PinConfig Pots[] {
