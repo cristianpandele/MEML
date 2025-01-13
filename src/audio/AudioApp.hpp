@@ -3,11 +3,12 @@
 
 
 #include "AudioDriver.hpp"
+#include "../PicoDefs.hpp"
 
 #include <vector>
 
 void AudioAppSetup(void);
-stereosample_t AudioAppProcess(stereosample_t);
-void AudioAppSetParams(std::vector<float> &params);
+stereosample_t AUDIO_FUNC(AudioAppProcess)(stereosample_t);
+void AUDIO_FUNC(AudioAppSetParams)(std::vector<float> &params);
 
 #endif  // __AUDIO_APP_HPP__

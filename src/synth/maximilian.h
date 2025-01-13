@@ -48,6 +48,8 @@ using namespace std;
 #define MAXITYPE float
 
 
+
+
 //if using CHEERP, then convert incoming arrays to vectors inplace, otherwise, preserve the C++ vector interface
 //see maxiIndex for a simple example
 // #define DOUBLEARRAY_REF vector<float> &

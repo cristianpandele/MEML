@@ -26,7 +26,7 @@ void AudioAppSetup(void)
 
 size_t count=0;
 
-stereosample_t AudioAppProcess(stereosample_t y)
+stereosample_t AUDIO_FUNC(AudioAppProcess)(stereosample_t y)
 {
 #if FM_SYNTH
     y.L = fm_synth_.process();
@@ -39,7 +39,7 @@ stereosample_t AudioAppProcess(stereosample_t y)
     return y;
 }
 
-void AudioAppSetParams(std::vector<float> &params)
+void AUDIO_FUNC(AudioAppSetParams)(std::vector<float> &params)
 {
 #if FM_SYNTH
     fm_synth_.mapParameters(params);
