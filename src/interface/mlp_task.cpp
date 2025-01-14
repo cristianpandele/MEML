@@ -10,6 +10,8 @@
 #include <cassert>
 #include <string>
 
+#include "../PicoDefs.hpp"
+
 #include <Arduino.h>
 
 
@@ -45,7 +47,6 @@ static bool randomised_state_ = false;
 static bool redraw_weights_ = true;
 static bool flag_zoom_in_ = false;
 static float speed_ = 1.0f;
-static te_expl_mode expl_mode_internal_ = expl_mode_pretrain;
 static size_t nn_n_ = 0;
 
 
@@ -171,7 +172,7 @@ void mlp_draw(float speed)
         Serial.println("MLP- Weights randomised.");
         redraw_weights_ = false;
     } else {
-        if (expl_mode_internal_ == expl_mode_zoom) {
+        if (gAppState.current_expl_mode == expl_mode_zoom) {
 
             flag_zoom_in_ = true;
             zoom_mode_centre_ = mlp_stored_input;
@@ -185,7 +186,7 @@ void mlp_draw(float speed)
                 zoom_mode_centre_.potRotate);
             Serial.println(serial_data);
 
-        } else if (expl_mode_internal_ == expl_mode_pretrain) {
+        } else if (gAppState.current_expl_mode == expl_mode_pretrain) {
 
             zoom_mode_centre_ = kZoom_mode_reset;
             flag_zoom_in_ = true;
@@ -195,7 +196,7 @@ void mlp_draw(float speed)
             Serial.print(speed*100.f);
             Serial.println("%).");
 
-        } else if (expl_mode_internal_ == expl_mode_nnweights) {
+        } else if (gAppState.current_expl_mode == expl_mode_nnweights) {
 
             zoom_mode_centre_ = kZoom_mode_reset;
             // Randomise weights less ("move" by speed)
@@ -264,7 +265,7 @@ void mlp_set_speed(float speed)
 
 void mlp_set_expl_mode(te_expl_mode mode)
 {
-    expl_mode_internal_ = mode;
+    gAppState.current_expl_mode = mode;
     // redraw_weights_ = true;
     zoom_mode_centre_ = kZoom_mode_reset;
 }
