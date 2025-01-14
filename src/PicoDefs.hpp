@@ -47,5 +47,16 @@ extern ts_app_state gAppState;
 /** Global MEML interface (define only once). */
 extern MEMLInterface meml_interface;
 
+uint32_t pico_get_random_bits(int num_bits) {
+    uint32_t random_value = 0;
+
+    // Read RANDOMBIT num_bits times
+    for (int i = 0; i < num_bits; i++) {
+        // Shift the random value left by 1 and add the RANDOMBIT
+        random_value = (random_value << 1) | (rosc_hw->randombit & 0x1);
+    }
+
+    return random_value;
+}
 
 #endif  // __PICO_DEFS_HPP__
