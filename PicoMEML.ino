@@ -8,6 +8,7 @@
 #elif FX_PROCESSOR
 #include "src/synth/matrixMix.hpp"
 #endif  // FM_SYNTH
+
 #include "src/interface/MEMLInterface.hpp"
 #include "src/interface/mlp_task.hpp"
 
@@ -24,17 +25,7 @@ static volatile bool flag_init_1 = false;
 
 const bool waitForSerialOnStart = true;
 
-uint32_t get_random_bits(int num_bits) {
-    uint32_t random_value = 0;
 
-    // Read RANDOMBIT num_bits times
-    for (int i = 0; i < num_bits; i++) {
-        // Shift the random value left by 1 and add the RANDOMBIT
-        random_value = (random_value << 1) | (rosc_hw->randombit & 0x1);
-    }
-
-    return random_value;
-}
 
 // Global app state
 ts_app_state gAppState = {
@@ -57,8 +48,8 @@ MEMLInterface meml_interface(
     &FMSynth::GenParams,
 #elif FX_PROCESSOR
     &MaxtrixMixApp::GenParams,
-    kN_synthparams
 #endif  // FM_SYNTH
+    kN_synthparams
 );
 
 
@@ -69,7 +60,7 @@ void setup() {
     if (waitForSerialOnStart){
         while(!Serial) {;}
     }
-    uint32_t seed = get_random_bits(32);
+    uint32_t seed = pico_get_random_bits(32);
     // Print the generated seed
     //Serial.printf("Generated Random Seed: %u\n", seed);
     // Seed the standard PRNG
