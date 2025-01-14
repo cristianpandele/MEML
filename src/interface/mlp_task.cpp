@@ -9,10 +9,13 @@
 #include <cstdio>
 #include <cassert>
 #include <string>
+#include <deque>
 
 #include "../PicoDefs.hpp"
 
 #include <Arduino.h>
+#include "RingBuf.h"
+
 
 // Private "methods"
 static void mlp_load_all_();
@@ -55,8 +58,21 @@ static size_t nn_n_ = 0;
 
 queue_t *nn_paramupdate_ = nullptr;
 
-void mlp_init(queue_t *nn_paramupdate, size_t n_inputs, size_t n_params)
+std::deque<float> inputRB; //ring buffer for inputs. Maybe a more efficient way to do this?
+
+void mlp_init(queue_t *nn_paramupdate, size_t n_inputs, size_t n_params, size_t n_inputbuffer)
 {
+    Serial.printf("MLP Init %d\n", n_params);
+
+    n_inputs *= n_inputbuffer;
+    // fill up a ring buffer
+
+    if (n_inputbuffer > 1) {
+        for(size_t i=0; i < n_inputs; i++) {
+            inputRB.push_back(0);
+        }
+    }
+    
     const std::vector<size_t> layers_nodes = {
         n_inputs + kBias,
         10, 10, 14,
@@ -67,15 +83,23 @@ void mlp_init(queue_t *nn_paramupdate, size_t n_inputs, size_t n_params)
 
     // Instantiate objects
     assert(kMaxDatasets == kMaxModels);
-    for (unsigned int n = 0; n < kMaxModels; n++) {
+    for (size_t n = 0; n < kMaxModels; n++) {
+        Serial.printf("Making DS %d\n");
         dataset_[n] = new(dataset_mem_[n]) Dataset();
-        mlp_[n] = new (mlp_mem_[n]) MLP<float>(
+        Serial.printf("Making MLP %d\n");
+        
+        mlp_[n] = new (std::nothrow) MLP<float>(
             layers_nodes,
             layers_activfuncs,
             loss::LOSS_MSE,
             use_constant_weight_init,
             constant_weight_init
         );
+        if (!mlp_[n]) {
+            Serial.printf("Out of memory allocating MLP %ul\n", n);
+        }else{
+            Serial.printf("MLP %d allocated\n", n);
+        }
     }
 
     // Instantiate channels
@@ -216,6 +240,20 @@ void mlp_draw(float speed)
 void mlp_add_data_point(const std::vector<float> &in, const std::vector<float> &out)
 {
     dataset_[ds_n_]->Add(in, out);
+    mlp_trigger_redraw_();
+}
+
+void mlp_buffer_datapoint_tdnn(const std::vector<float> &in) {
+for(size_t i=0; i < in.size(); i++) {
+    inputRB.pop_front();
+    inputRB.push_back(in.at(i));
+}
+}
+
+void mlp_add_data_point_tdnn(const std::vector<float> &in, const std::vector<float> &out)
+{
+    std::vector<float> inputVector(inputRB.begin(), inputRB.end());
+    dataset_[ds_n_]->Add(inputVector, out);
     mlp_trigger_redraw_();
 }
 
