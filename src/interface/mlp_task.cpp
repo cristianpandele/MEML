@@ -39,7 +39,6 @@ static size_t ds_n_ = 0;
 
 // MLP memory
 static MLP<float> *mlp_[kMaxModels] = { nullptr };
-static char mlp_mem_[kMaxModels][sizeof(MLP<float>)];
 static size_t n_output_params_ = 0;
 static MLP<float>::mlp_weights mlp_stored_weights_;
 static input_data_t zoom_mode_centre_;
@@ -84,9 +83,7 @@ void mlp_init(queue_t *nn_paramupdate, size_t n_inputs, size_t n_params, size_t 
     // Instantiate objects
     assert(kMaxDatasets == kMaxModels);
     for (size_t n = 0; n < kMaxModels; n++) {
-        Serial.printf("Making DS %d\n");
         dataset_[n] = new(dataset_mem_[n]) Dataset();
-        Serial.printf("Making MLP %d\n");
         
         mlp_[n] = new (std::nothrow) MLP<float>(
             layers_nodes,

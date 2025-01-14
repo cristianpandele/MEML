@@ -75,8 +75,6 @@ public:
 
     void loop() {
         float phasor = ph->Process();
-        bool pulse = ph->ToPulse(phasor);
-        static size_t ct=0;
 
         // Generate     
         for(size_t i_generator=0; i_generator < kNGenerators; i_generator++) {
