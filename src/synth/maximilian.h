@@ -227,7 +227,7 @@ inline float maxiDelayline<DELAYTIME>::play(const float input, const size_t size
 	if (size >= DELAYTIME) {
 		return 0;
 	}
-	if ( phase >=size ) {
+	if ( phase >= static_cast<int>(size) ) {
 		phase = 0;
 	}
 	float output=memory[phase];

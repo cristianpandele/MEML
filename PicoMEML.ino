@@ -57,8 +57,8 @@ MEMLInterface meml_interface(
     &FMSynth::GenParams,
 #elif FX_PROCESSOR
     &MaxtrixMixApp::GenParams,
-    kN_synthparams
 #endif  // FM_SYNTH
+    kN_synthparams
 );
 
 
