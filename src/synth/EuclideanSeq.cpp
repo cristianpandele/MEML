@@ -119,11 +119,13 @@ int EuclideanSeq::MakeN_(float param)
 }
 
 
-int EuclideanSeq::MakeMul_(float param) {
+int EuclideanSeq::MakeMul_(float param, size_t curve) {
     static std::vector<int> mul_lookup{ 1, 2, 4 };
 
     // Law multiplier like x^3
-    param = param * param * param;
+    for(size_t i=0; i < curve; i++) {
+        param *= param;
+    } 
 
     float n = param * mul_lookup.size();
     n = std::floor(n);
@@ -134,7 +136,7 @@ int EuclideanSeq::MakeMul_(float param) {
         n += 1.;
     }
 
-    return mul_lookup[static_cast<size_t>(n)];
+    return mul_lookup.at(static_cast<size_t>(n));
 }
 
 
@@ -166,7 +168,7 @@ void EuclideanSeq::MapNNParams(std::vector<float> nn_params)
     float offset_n = nn_params[2] * offset_n_range;
 
     // ph_mult
-    int ph_mult = MakeMul_(nn_params[4]);
+    int ph_mult = MakeMul_(nn_params[4],0);
 
     const params set_p {
         static_cast<int>(n),

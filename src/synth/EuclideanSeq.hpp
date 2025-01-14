@@ -41,7 +41,7 @@ class EuclideanSeq {
     float probes_[n_probes_];
 
     int MakeN_(float param);
-    int MakeMul_(float param);
+    int MakeMul_(float param, size_t curve=0);
 };
 
 const size_t kNGenerators = 4;
