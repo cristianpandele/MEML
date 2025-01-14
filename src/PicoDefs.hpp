@@ -6,13 +6,17 @@
 
 
 // Select which example app to run
-#define FM_SYNTH         0
-#define FX_PROCESSOR     1
+#define FM_SYNTH         0  ///< FM Synth (new macro)
+#define FX_PROCESSOR     1  ///< FX Processor (new macro)
 
 
-#define AUDIO_FUNC(x)    __not_in_flash_func(x)
-#define AUDIO_MEM    __not_in_flash("audio")
+#define AUDIO_FUNC(x)    __not_in_flash_func(x)  ///< Macro to make audio function load from mem
+#define AUDIO_MEM    __not_in_flash("audio")  ///< Macro to make variable load from mem
 
+
+/**
+ * @brief Pin configuration on the Pi Pico 2
+ */
 enum PinConfig {
     i2c_sgt5000Data = 0,
     i2c_sgt5000Clk = 1,
@@ -38,7 +42,9 @@ enum PinConfig {
 
 
 // Global objects
+/** Global app state container (define only once). */
 extern ts_app_state gAppState;
+/** Global MEML interface (define only once). */
 extern MEMLInterface meml_interface;
 
 

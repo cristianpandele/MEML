@@ -1,0 +1,170 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.4 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="26.0.4">
+  <diagram name="Page-1" id="eIFb_NlMMgxUuvhVnGcC">
+    <mxGraphModel dx="1839" dy="578" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-45" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="590" y="220" width="270" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-2" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=2;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="370" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-3" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=2;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="540" y="140" width="370" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-4" value="Core 0" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-5" value="Core 1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="540" y="110" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-9" value="queue_audioparam" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="430" y="319" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-10" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#fff2cc;strokeColor=#d6b656;" edge="1" parent="1" source="WRJJqniTlhcr_sfOXrkd-3" target="WRJJqniTlhcr_sfOXrkd-2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="430" y="360" as="sourcePoint" />
+            <mxPoint x="480" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-11" value="" style="pointerEvents=1;verticalLabelPosition=bottom;shadow=0;dashed=0;align=center;html=1;verticalAlign=top;shape=mxgraph.electrical.electro-mechanical.loudspeaker;rotation=-180;" vertex="1" parent="1">
+          <mxGeometry x="-30" y="489" width="30" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-12" value="" style="verticalLabelPosition=bottom;shadow=0;dashed=0;align=center;html=1;verticalAlign=top;shape=mxgraph.electrical.radio.microphone_1;" vertex="1" parent="1">
+          <mxGeometry x="-20" y="439" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-13" value="Audio in" style="text;html=1;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-60" y="409" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-14" value="Audio out" style="text;html=1;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-60" y="466" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-16" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="417" width="310" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-17" value="i2c callback" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="70" y="417" width="260" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-19" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="WRJJqniTlhcr_sfOXrkd-12" target="WRJJqniTlhcr_sfOXrkd-16">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="360" as="sourcePoint" />
+            <mxPoint x="400" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-20" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=-0.01;entryY=0.484;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="WRJJqniTlhcr_sfOXrkd-16" target="WRJJqniTlhcr_sfOXrkd-11">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="360" as="sourcePoint" />
+            <mxPoint x="400" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-21" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;Frame-by-frame audio processing&lt;div&gt;&lt;b&gt;Insert your audio code here!&lt;/b&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="90" y="452" width="270" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-22" value="src/audio/AudioApp.cpp AudioAppProcess()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="90" y="452" width="270" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-23" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="290" width="310" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-24" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" edge="1" parent="1" source="WRJJqniTlhcr_sfOXrkd-2" target="WRJJqniTlhcr_sfOXrkd-23">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="380" y="360" as="sourcePoint" />
+            <mxPoint x="430" y="310" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="410" y="350" />
+              <mxPoint x="410" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-25" value="loop()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="70" y="290" width="260" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-26" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Map parameters from neural network&lt;/div&gt;&lt;div&gt;&lt;b&gt;Insert your parameter update code here!&lt;/b&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="90" y="320" width="270" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-27" value="src/audio/AudioApp.cpp AudioAppSetParams()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="90" y="320" width="270" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-28" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="70" y="160" width="310" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-29" value="setup()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="70" y="160" width="260" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-30" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Initialise DSP/audio app&lt;/div&gt;&lt;div&gt;&lt;b&gt;Insert your audio setup code here!&lt;/b&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="90" y="190" width="270" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-31" value="src/audio/AudioApp.cpp AudioAppSetup()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="90" y="190" width="270" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-35" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="570" y="289" width="310" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-36" value="loop1()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="570" y="289" width="260" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-37" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Poll and read for ADCs and rotary encoders&lt;/div&gt;&lt;div&gt;&lt;b&gt;Insert your pot/encoder code here!&lt;/b&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="590" y="319" width="270" height="78" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-39" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="570" y="159" width="310" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-40" value="setup1()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="570" y="159" width="260" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-42" value="src/interface/ButtonPots.cpp ButtonPots::Setup()&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="590" y="189" width="270" height="51" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-43" value="src/interface/mlp_task.cpp mlp_init()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="590" y="240" width="270" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-47" value="src/interface/ButtonPots.cpp ButtonPots::Process()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="590" y="319" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-49" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="WRJJqniTlhcr_sfOXrkd-37" target="WRJJqniTlhcr_sfOXrkd-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="500" y="380" as="sourcePoint" />
+            <mxPoint x="540" y="320" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="560" y="358" />
+              <mxPoint x="560" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-50" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="570" y="420" width="310" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-51" value="GPIO callback" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="570" y="417" width="260" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-52" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Insert your GPIO (button/toggle) code here!&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="590" y="440" width="270" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-53" value="src/interface/ButtonPots.cpp ButtonPots::ButtonISR()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="590" y="439" width="290" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-56" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;" vertex="1" parent="1">
+          <mxGeometry x="600" y="471.5" width="250" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-54" value="src/interface/ButtonPots.cpp ButtonPots::Setup()" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="600" y="472.5" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-58" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="WRJJqniTlhcr_sfOXrkd-57">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="880" y="484" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-57" value="Buttons" style="labelPosition=center;verticalLabelPosition=middle;align=center;html=1;shape=mxgraph.basic.button;dx=10;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="930" y="454" width="70" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-59" value="Insert your GPIO/ADC code here!" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="620" y="210" width="210" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WRJJqniTlhcr_sfOXrkd-61" value="&lt;span style=&quot;font-style: normal;&quot;&gt;Sends a message of &lt;/span&gt;kN_synthparams&lt;span style=&quot;font-style: normal;&quot;&gt; elements to AudioApp&lt;/span&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="430" y="360" width="110" height="70" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

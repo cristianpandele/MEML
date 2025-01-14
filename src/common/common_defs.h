@@ -8,14 +8,17 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
+/** (Deprecated) internal definition of number (to change precision) */
 typedef float num_t;
 
+/** Struct to exchange 3D joystick data */
 typedef struct {
     float potX;
     float potY;
     float potRotate;
 } ts_joystick_read;
 
+/** Struct to exchange simplified MIDI data */
 typedef struct {
     size_t note_number;
     float velocity;
@@ -25,6 +28,7 @@ typedef struct {
  * UI elements
  */
 
+/** Index of pots in a 3D joystick */
 typedef enum {
     joystick_potX,
     joystick_potY,
@@ -32,6 +36,7 @@ typedef enum {
     joystick_nPots
 } te_joystick_pot;
 
+/** Button indexes for the MEML interface (legacy) */
 typedef enum {
     toggle_training,   // 0
     button_randomise,  // 1
@@ -46,6 +51,7 @@ typedef enum {
     button_nButtons
 } te_button_idx;
 
+/** Slider indexes for the MEML interface (legacy) */
 typedef enum {
     slider_randomSpeed,
     slider_nIterations,
@@ -56,33 +62,39 @@ typedef enum {
  * Behavioural elements/flags
  */
 
+/** Neural network mode (training or inference) */
 typedef enum {
     mode_inference,
     mode_training,
     mode_nModes
 } te_nn_mode;
 
+
+/** Exploration/zoom mode */
 typedef enum {
-    expl_mode_nnweights,
-    expl_mode_pretrain,
-    expl_mode_zoom,
+    expl_mode_nnweights,  ///< Randomise the NN weights with a bit of Gaussian noise
+    expl_mode_pretrain,  ///< Pretrain the network around a single point
+    expl_mode_zoom,  ///< Restrict exploration movement only (zoom)
     expl_nModes
 } te_expl_mode;
 
+/** Info for web UI (legacy) */
 typedef enum {
     ui_last_error,
     ui_nElements,
 } te_ui_info;
 
+/** MEML app IDs (legacy) */
 typedef enum {
-    app_id_unknown,
-    app_id_fmsynth,
-    app_id_euclidean,
-    app_id_multifx,
-    app_id_machinelisten,
+    app_id_unknown,  ///< Unknown/new app
+    app_id_fmsynth,  ///< FM synth
+    app_id_euclidean,  ///< Euclidean sequencer
+    app_id_multifx,  ///< Multi-FX matrix processor
+    app_id_machinelisten,  ///< Machine-listening FX processor
     app_nIDs
 } te_app_id;
 
+/** MIDI command type */
 typedef enum {
     midi_noteon,
     midi_noteoff,
@@ -97,19 +109,23 @@ typedef enum {
  */
 
 
+/**
+ * Global app state type. Define only once
+ * and use everywhere (search for gAppState).
+ */
 typedef struct {
 
     // 32-bit parameters
-    uint32_t n_iterations;
-    float last_error;
-    float exploration_range;
+    uint32_t n_iterations;  ///< Maximum number of iterations in training
+    float last_error;  ///< Last loss/error value when trained
+    float exploration_range;  ///< Exploration/zoom range when training (0-1)
 
     // 8-bit parameters
-    te_app_id app_id;
-    uint8_t current_dataset;
-    uint8_t current_model;
-    te_nn_mode current_nn_mode;
-    te_expl_mode current_expl_mode;
+    te_app_id app_id;  ///< App ID when needed
+    uint8_t current_dataset;  ///< Current dataset index used (0-3 usually)
+    uint8_t current_model;  ///< Current model index used (0-3 usually)
+    te_nn_mode current_nn_mode;  ///< Current interaction mode (training/inference)
+    te_expl_mode current_expl_mode;  ///< Current exploration mode (when zooming in/out)
 
 } ts_app_state;
 
