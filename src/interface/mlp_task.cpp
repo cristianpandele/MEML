@@ -14,7 +14,6 @@
 
 #include <Arduino.h>
 
-
 // Private "methods"
 static void mlp_load_all_();
 static void mlp_save_all_();
@@ -28,7 +27,7 @@ static const std::vector<ACTIVATION_FUNCTIONS> layers_activfuncs = {
 };
 static const bool use_constant_weight_init = false;
 static const float constant_weight_init = 0;
-static constexpr ts_joystick_read kZoom_mode_reset { 0.5, 0.5, 0.5 };
+static input_data_t kZoom_mode_reset;
 
 // Dataset memory
 static char dataset_mem_[kMaxDatasets][sizeof(Dataset)];
@@ -40,8 +39,8 @@ static MLP<float> *mlp_[kMaxModels] = { nullptr };
 static char mlp_mem_[kMaxModels][sizeof(MLP<float>)];
 static size_t n_output_params_ = 0;
 static MLP<float>::mlp_weights mlp_stored_weights_;
-static ts_joystick_read zoom_mode_centre_ = kZoom_mode_reset;
-static ts_joystick_read mlp_stored_input = kZoom_mode_reset;
+static input_data_t zoom_mode_centre_;
+static input_data_t mlp_stored_input;
 std::vector<float> mlp_stored_output;
 static bool randomised_state_ = false;
 static bool redraw_weights_ = true;
@@ -56,10 +55,10 @@ static size_t nn_n_ = 0;
 
 queue_t *nn_paramupdate_ = nullptr;
 
-void mlp_init(queue_t *nn_paramupdate, size_t n_params)
+void mlp_init(queue_t *nn_paramupdate, size_t n_inputs, size_t n_params)
 {
     const std::vector<size_t> layers_nodes = {
-        sizeof(ts_joystick_read)/sizeof(float) + kBias,
+        n_inputs + kBias,
         10, 10, 14,
         n_params
     };
@@ -81,6 +80,12 @@ void mlp_init(queue_t *nn_paramupdate, size_t n_params)
 
     // Instantiate channels
     nn_paramupdate_ = nn_paramupdate;
+
+    // Init the caching of input data
+    const float init_val = 0.5;
+    kZoom_mode_reset.resize(n_inputs, init_val);
+    zoom_mode_centre_.resize(n_inputs, init_val);
+    mlp_stored_input.resize(n_inputs, init_val);
 
     Serial.println("MLP- Initialised.");
 
@@ -181,9 +186,8 @@ void mlp_draw(float speed)
             char serial_data[256];
             std::sprintf(
                 serial_data,
-                "MLP- Moving with speed %f%% around (%.3f, %.3f, %.3f)",
-                speed*100.f, zoom_mode_centre_.potX, zoom_mode_centre_.potY,
-                zoom_mode_centre_.potRotate);
+                "MLP- Moving with speed %f%% around (%.3f etc...)",
+                speed*100.f, zoom_mode_centre_[0]);
             Serial.println(serial_data);
 
         } else if (gAppState.current_expl_mode == expl_mode_pretrain) {
@@ -299,10 +303,10 @@ void mlp_set_dataset_idx(size_t idx)
     }
 }
 
-void mlp_inference_nochannel(ts_joystick_read joystick_read) {
+void mlp_inference(input_data_t joystick_read) {
 
     // Function to zoom and offset by given range
-    static const auto zoom_in_ = [](float x, float move_by, char coord) {
+    static const auto zoom_in_ = [](float x, float move_by) {
         float local_range = 0.5f*speed_;
         float move_by_mod = move_by;
         // Nudge if too big
@@ -324,24 +328,19 @@ void mlp_inference_nochannel(ts_joystick_read joystick_read) {
 
     // If we're zooming in, we want speed to shrink our view
     if (flag_zoom_in_) {
-        joystick_read.potX = zoom_in_(joystick_read.potX, zoom_mode_centre_.potX, 'x');
-        joystick_read.potY = zoom_in_(joystick_read.potY, zoom_mode_centre_.potY, 'y');
-        joystick_read.potRotate = zoom_in_(joystick_read.potRotate, zoom_mode_centre_.potRotate, 'z');
+        for (unsigned int n = 0; n < joystick_read.size(); n++) {
+            joystick_read[n] = zoom_in_(joystick_read[n], zoom_mode_centre_[n]);
+        }
     }
 
         // Store current joystick read
         mlp_stored_input = joystick_read;
 
     // Instantiate data in/out
-    std::vector<num_t> input{
-        joystick_read.potX,
-        joystick_read.potY,
-        joystick_read.potRotate,
-        1.f  // bias
-    };
+    joystick_read.push_back(1.0f);
     std::vector<num_t> output(n_output_params_);
     // Run model
-    mlp_[nn_n_]->GetOutput(input, &output);
+    mlp_[nn_n_]->GetOutput(joystick_read, &output);
 
     // TODO apply transform here if set
 

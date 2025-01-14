@@ -48,7 +48,9 @@ void MEMLInterface::SetSlider(te_slider_idx idx, num_t value)
             // TODO deprecate those local values!!!
             draw_speed_ = value;
             mlp_set_speed(draw_speed_);
-            mlp_inference_nochannel(joystick_current_.as_struct);
+            mlp_inference({ joystick_current_.as_struct.potX,
+                            joystick_current_.as_struct.potY,
+                            joystick_current_.as_struct.potRotate });
         } break;
 
         case slider_nIterations: {
@@ -78,7 +80,9 @@ void MEMLInterface::UpdatePots()
 {
     // If inference, run inference here
     if (joystick_inference_) {
-        mlp_inference_nochannel(joystick_current_.as_struct);
+        mlp_inference({ joystick_current_.as_struct.potX,
+                        joystick_current_.as_struct.potY,
+                        joystick_current_.as_struct.potRotate });
     }
 }
 
@@ -96,7 +100,9 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
         case toggle_training: {
             if (state == mode_inference && gAppState.current_nn_mode == mode_training) {
                 mlp_train();
-                mlp_inference_nochannel(joystick_current_.as_struct);
+                mlp_inference({ joystick_current_.as_struct.potX,
+                                joystick_current_.as_struct.potY,
+                                joystick_current_.as_struct.potRotate });
             }
             gAppState.current_nn_mode = static_cast<te_nn_mode>(state);
             // Set the LED
@@ -130,7 +136,9 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
                 Serial.println("INTF- Random params");
 #else
                 mlp_draw(draw_speed_);
-                mlp_inference_nochannel(joystick_current_.as_struct);
+                mlp_inference({ joystick_current_.as_struct.potX,
+                                joystick_current_.as_struct.potY,
+                                joystick_current_.as_struct.potRotate });
 #endif
             }
         } break;
@@ -167,7 +175,9 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
 
         case button_clearmodel: {
             mlp_clear_model();
-            mlp_inference_nochannel(joystick_current_.as_struct);
+            mlp_inference({ joystick_current_.as_struct.potX,
+                            joystick_current_.as_struct.potY,
+                            joystick_current_.as_struct.potRotate });
         } break;
 
         case toggle_explmode: {
@@ -197,7 +207,9 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
 
         case toggle_model: {
             mlp_set_model_idx(state);
-            mlp_inference_nochannel(joystick_current_.as_struct);
+            mlp_inference({ joystick_current_.as_struct.potX,
+                            joystick_current_.as_struct.potY,
+                            joystick_current_.as_struct.potRotate });
         } break;
 
         default: {}

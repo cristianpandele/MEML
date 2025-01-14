@@ -122,7 +122,9 @@ void setup1() {
         pinMode(out_pin, OUTPUT);
     }
     // MLP setup
-    mlp_init(&queue_audioparam, kN_synthparams);
+    mlp_init(&queue_audioparam,
+             sizeof(ts_joystick_read)/sizeof(float),
+             kN_synthparams);
 
     // Wait for init sync
     flag_init_1 = true;
