@@ -38,12 +38,13 @@ const bool waitForSerialOnStart = true;
 ts_app_state gAppState = {
     .n_iterations = 500,
     .last_error = 0.0f,
-    .exploration_range = 0.0f,
+    .exploration_range = 0.4f,
     .app_id = app_id_euclidean,
     .current_dataset = 0,
     .current_model = 0,
     .current_nn_mode = mode_inference,
-    .current_expl_mode = expl_mode_nnweights
+    .current_expl_mode = expl_mode_pretrain
+    
 };
 
 // Global objects
