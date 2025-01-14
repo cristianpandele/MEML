@@ -151,7 +151,7 @@ void setup1() {
     }
     Serial.println("Input Pins Set");
     // MLP setup
-    mlp_init(&queue_audioparam, kN_synthparams, 32);
+    mlp_init(&queue_audioparam, kN_synthparams);
     Serial.println("MLP Started");
 
     // Wait for init sync
