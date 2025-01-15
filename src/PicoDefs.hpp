@@ -5,9 +5,9 @@
 #include "interface/MEMLInterface.hpp"
 
 // Select which example app to run
-#define FM_SYNTH         0  ///< FM Synth (new macro)
+#define FM_SYNTH         1  ///< FM Synth (new macro)
 #define FX_PROCESSOR     0  ///< FX Processor (new macro)
-#define EUCLIDEAN        1
+#define EUCLIDEAN        0
 
 
 #define AUDIO_FUNC(x)    __not_in_flash_func(x)  ///< Macro to make audio function load from mem
