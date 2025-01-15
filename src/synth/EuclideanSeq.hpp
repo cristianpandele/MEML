@@ -44,7 +44,7 @@ class EuclideanSeq {
     int MakeMul_(float param, size_t curve=0);
 };
 
-const size_t kNGenerators = 4;
+const size_t kNGenerators = 7;
 constexpr size_t kN_synthparams = kNGenerators * EuclideanSeq::n_params;
 
 
@@ -113,7 +113,12 @@ private:
     Phasor *ph;
     EuclideanSeq *seq[kNGenerators] = { nullptr };
 
-    const size_t pulsePins[kNGenerators] = {PinConfig::pulse0,PinConfig::pulse1,PinConfig::pulse2,PinConfig::pulse3};
+    const size_t pulsePins[kNGenerators] = {PinConfig::pulse0,PinConfig::pulse1,PinConfig::pulse2,
+    PinConfig::pulse3,
+    PinConfig::pulse4,
+    PinConfig::pulse5,
+    PinConfig::pulse6
+    };
 
 };
 

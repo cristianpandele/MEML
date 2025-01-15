@@ -21,8 +21,10 @@ enum PinConfig {
     i2c_sgt5000Data = 0,
     i2c_sgt5000Clk = 1,
     led_Training = 2,
+#if FMSYNTH
     uart_MidiTX = 4,
     uart_MidiRX = 5,
+#endif
     i2s_pDIN = 6,
     i2s_pDOUT = 7,
     i2s_pBCLK = 8,
@@ -44,7 +46,10 @@ enum PinConfig {
     pulse0=20,
     pulse1=21,
     pulse2=12,
-    pulse3=11
+    pulse3=11,
+    pulse4=3,
+    pulse5=4,
+    pulse6=5
 #endif    
 };
 

@@ -120,7 +120,7 @@ int EuclideanSeq::MakeN_(float param)
 
 
 int EuclideanSeq::MakeMul_(float param, size_t curve) {
-    static std::vector<int> mul_lookup{ 1, 2, 4 };
+    static std::vector<int> mul_lookup{ 1,1,2,2,3,4,8 };
 
     // Law multiplier like x^3
     for(size_t i=0; i < curve; i++) {
