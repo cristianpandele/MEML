@@ -13,7 +13,7 @@
 #include <cmath>
 
 #if FM_SYNTH
-static AUDIO_MEM fm_synth_(kSampleRate);
+static AUDIO_MEM FMSynth fm_synth_(kSampleRate);
 #elif FX_PROCESSOR
 static AUDIO_MEM MaxtrixMixApp multi_fx_app_(kSampleRate);
 #elif EUCLIDEAN
