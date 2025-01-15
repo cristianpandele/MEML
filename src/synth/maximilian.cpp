@@ -373,147 +373,109 @@ float maxiOsc::triangle(float frequency) {
 }
 
 
-// //float maxiEnvelope::line(int numberofsegments,float segments[1000]) {
-// float maxiEnvelope::line(int numberofsegments,std::vector<float>& segments) {
-// 	//This is a basic multi-segment ramp generator that you can use for more or less anything.
-// 	//However, it's not that intuitive.
-// 	if (isPlaying==1) {//only make a sound once you've been triggered
-// 		period=4./(segments[valindex+1]*0.0044);
-// 		nextval=segments[valindex+2];
-// 		currentval=segments[valindex];
-// 		if (currentval-amplitude > 0.0000001 && valindex < numberofsegments) {
-// 			amplitude += ((currentval-startval)/(maxiSettings::sampleRate/period));
-// 		} else if (currentval-amplitude < -0.0000001 && valindex < numberofsegments) {
-// 			amplitude -= (((currentval-startval)*(-1))/(maxiSettings::sampleRate/period));
-// 		} else if (valindex >numberofsegments-1) {
-// 			valindex=numberofsegments-2;
-// 		} else {
-// 			valindex=valindex+2;
-// 			startval=currentval;
-// 		}
-// 		output=amplitude;
 
-// 	}
-// 	else {
-// 		output=0;
+//I particularly like these. cutoff between 0 and 1
+float maxiFilter::lopass(float input, float cutoff) {
+	output=outputs[0] + cutoff*(input-outputs[0]);
+	outputs[0]=output;
+	return(output);
+}
 
-// 	}
-// 	return(output);
-// }
+//as above
+float maxiFilter::hipass(float input, float cutoff) {
+	output=input-(outputs[0] + cutoff*(input-outputs[0]));
+	outputs[0]=output;
+	return(output);
+}
+//awesome. cuttof is freq in hz. res is between 1 and whatever. Watch out!
+float maxiFilter::lores(float input,float cutoff1, float resonance) {
+	cutoff=cutoff1;
+	if (cutoff<10) cutoff=10;
+	if (cutoff>(maxiSettings::sampleRate)) cutoff=(maxiSettings::sampleRate);
+	if (resonance<1.) resonance = 1.;
+	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
+	c=2-2*z;
+	float r=(sqrt(2.0)*sqrt(-pow((z-1.0),3.0))+resonance*(z-1))/(resonance*(z-1));
+	x=x+(input-y)*c;
+	y=y+x;
+	x=x*r;
+	output=y;
+	return(output);
+}
 
+//working hires filter
+float maxiFilter::hires(float input,float cutoff1, float resonance) {
+	cutoff=cutoff1;
+	if (cutoff<10) cutoff=10;
+	if (cutoff>(maxiSettings::sampleRate)) cutoff=(maxiSettings::sampleRate);
+	if (resonance<1.) resonance = 1.;
+	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
+	c=2-2*z;
+	float r=(sqrt(2.0)*sqrt(-pow((z-1.0),3.0))+resonance*(z-1))/(resonance*(z-1));
+	x=x+(input-y)*c;
+	y=y+x;
+	x=x*r;
+	output=input-y;
+	return(output);
+}
 
+//This works a bit. Needs attention.
+float maxiFilter::bandpass(float input,float cutoff1, float resonance) {
+	cutoff=cutoff1;
+	if (cutoff>(maxiSettings::sampleRate*0.5)) cutoff=(maxiSettings::sampleRate*0.5);
+	if (resonance>=1.) resonance=0.999999;
+	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
+	inputs[0] = (1-resonance)*(sqrt(resonance*(resonance-4.0*pow(z,2.0)+2.0)+1));
+	inputs[1] = 2*z*resonance;
+	inputs[2] = pow((resonance*-1),2);
 
-// //and this
-// void maxiEnvelope::trigger(int index, float amp) {
-// 	isPlaying=1;//ok the envelope is being used now.
-// 	valindex=index;
-// 	amplitude=amp;
+	output=inputs[0]*input+inputs[1]*outputs[1]+inputs[2]*outputs[2];
+	outputs[2]=outputs[1];
+	outputs[1]=output;
+	return(output);
+}
 
-// }
+//stereo bus
+void maxiMix::stereo(float input,std::vector<float>&two,float x) {
+	if (x>1) x=1;
+	if (x<0) x=0;
+	two[0]=input*sqrt(1.0-x);
+	two[1]=input*sqrt(x);
+//	return two;
+}
 
-// //I particularly like these. cutoff between 0 and 1
-// float maxiFilter::lopass(float input, float cutoff) {
-// 	output=outputs[0] + cutoff*(input-outputs[0]);
-// 	outputs[0]=output;
-// 	return(output);
-// }
+//quad bus
+void maxiMix::quad(float input,std::vector<float>& four,float x,float y) {
+	if (x>1) x=1;
+	if (x<0) x=0;
+	if (y>1) y=1;
+	if (y<0) y=0;
+	four[0]=input*sqrt((1.0-x)*y);
+	four[1]=input*sqrt((1.0-x)*(1.0-y));
+	four[2]=input*sqrt(x*y);
+	four[3]=input*sqrt(x*(1.0-y));
+//	return(four);
+}
 
-// //as above
-// float maxiFilter::hipass(float input, float cutoff) {
-// 	output=input-(outputs[0] + cutoff*(input-outputs[0]));
-// 	outputs[0]=output;
-// 	return(output);
-// }
-// //awesome. cuttof is freq in hz. res is between 1 and whatever. Watch out!
-// float maxiFilter::lores(float input,float cutoff1, float resonance) {
-// 	cutoff=cutoff1;
-// 	if (cutoff<10) cutoff=10;
-// 	if (cutoff>(maxiSettings::sampleRate)) cutoff=(maxiSettings::sampleRate);
-// 	if (resonance<1.) resonance = 1.;
-// 	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
-// 	c=2-2*z;
-// 	float r=(sqrt(2.0)*sqrt(-pow((z-1.0),3.0))+resonance*(z-1))/(resonance*(z-1));
-// 	x=x+(input-y)*c;
-// 	y=y+x;
-// 	x=x*r;
-// 	output=y;
-// 	return(output);
-// }
-
-// //working hires filter
-// float maxiFilter::hires(float input,float cutoff1, float resonance) {
-// 	cutoff=cutoff1;
-// 	if (cutoff<10) cutoff=10;
-// 	if (cutoff>(maxiSettings::sampleRate)) cutoff=(maxiSettings::sampleRate);
-// 	if (resonance<1.) resonance = 1.;
-// 	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
-// 	c=2-2*z;
-// 	float r=(sqrt(2.0)*sqrt(-pow((z-1.0),3.0))+resonance*(z-1))/(resonance*(z-1));
-// 	x=x+(input-y)*c;
-// 	y=y+x;
-// 	x=x*r;
-// 	output=input-y;
-// 	return(output);
-// }
-
-// //This works a bit. Needs attention.
-// float maxiFilter::bandpass(float input,float cutoff1, float resonance) {
-// 	cutoff=cutoff1;
-// 	if (cutoff>(maxiSettings::sampleRate*0.5)) cutoff=(maxiSettings::sampleRate*0.5);
-// 	if (resonance>=1.) resonance=0.999999;
-// 	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
-// 	inputs[0] = (1-resonance)*(sqrt(resonance*(resonance-4.0*pow(z,2.0)+2.0)+1));
-// 	inputs[1] = 2*z*resonance;
-// 	inputs[2] = pow((resonance*-1),2);
-
-// 	output=inputs[0]*input+inputs[1]*outputs[1]+inputs[2]*outputs[2];
-// 	outputs[2]=outputs[1];
-// 	outputs[1]=output;
-// 	return(output);
-// }
-
-// //stereo bus
-// void maxiMix::stereo(float input,std::vector<float>&two,float x) {
-// 	if (x>1) x=1;
-// 	if (x<0) x=0;
-// 	two[0]=input*sqrt(1.0-x);
-// 	two[1]=input*sqrt(x);
-// //	return two;
-// }
-
-// //quad bus
-// void maxiMix::quad(float input,std::vector<float>& four,float x,float y) {
-// 	if (x>1) x=1;
-// 	if (x<0) x=0;
-// 	if (y>1) y=1;
-// 	if (y<0) y=0;
-// 	four[0]=input*sqrt((1.0-x)*y);
-// 	four[1]=input*sqrt((1.0-x)*(1.0-y));
-// 	four[2]=input*sqrt(x*y);
-// 	four[3]=input*sqrt(x*(1.0-y));
-// //	return(four);
-// }
-
-// //ambisonic bus
-// void maxiMix::ambisonic(float input,std::vector<float>&eight,float x,float y,float z) {
-// 	if (x>1) x=1;
-// 	if (x<0) x=0;
-// 	if (y>1) y=1;
-// 	if (y<0) y=0;
-// 	if (z>1) y=1;
-// 	if (z<0) y=0;
-// 	eight[0]=input*(sqrt((1.0-x)*y)*1.0-z);
-// 	eight[1]=input*(sqrt((1.0-x)*(1.0-y))*1.0-z);
-// 	eight[2]=input*(sqrt(x*y)*1.0-z);
-// 	eight[3]=input*(sqrt(x*(1.0-y))*1.0-z);
-// 	eight[4]=input*(sqrt((1.0-x)*y)*z);
-// 	eight[5]=input*(sqrt((1.0-x)*(1.0-y))*z);
-// 	eight[6]=input*sqrt((x*y)*z);
-// 	eight[7]=input*sqrt((x*(1.0-y))*z);
-// //	return(eight);
-// }
-// // --------------------------------------------------------------------------------
-// // MAXI_SAMPLE
+//ambisonic bus
+void maxiMix::ambisonic(float input,std::vector<float>&eight,float x,float y,float z) {
+	if (x>1) x=1;
+	if (x<0) x=0;
+	if (y>1) y=1;
+	if (y<0) y=0;
+	if (z>1) y=1;
+	if (z<0) y=0;
+	eight[0]=input*(sqrt((1.0-x)*y)*1.0-z);
+	eight[1]=input*(sqrt((1.0-x)*(1.0-y))*1.0-z);
+	eight[2]=input*(sqrt(x*y)*1.0-z);
+	eight[3]=input*(sqrt(x*(1.0-y))*1.0-z);
+	eight[4]=input*(sqrt((1.0-x)*y)*z);
+	eight[5]=input*(sqrt((1.0-x)*(1.0-y))*z);
+	eight[6]=input*sqrt((x*y)*z);
+	eight[7]=input*sqrt((x*(1.0-y))*z);
+}
+// --------------------------------------------------------------------------------
+// MAXI_SAMPLE
 
 
 // maxiSample::maxiSample():position(0), recordPosition(0), myChannels(1), mySampleRate(maxiSettings::sampleRate) {};
