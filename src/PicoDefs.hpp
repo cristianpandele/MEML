@@ -39,7 +39,8 @@ enum PinConfig {
     button_ZoomIn = 19,
     pot_JoystickX = 26,
     pot_JoystickY = 27,
-    pot_JoystickZ = 28
+    pot_JoystickZ = 28,
+    button_zoomModeSwitch = 17
 
 #ifdef EUCLIDEAN
     ,
