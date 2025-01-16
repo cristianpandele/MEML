@@ -9,8 +9,9 @@
 #include "../synth/EuclideanSeq.hpp"
 #endif
 #include <vector>
-
 #include <cmath>
+#include "AnalysisParams.hpp"
+
 
 #if FM_SYNTH
 static AUDIO_MEM FMSynth fm_synth_(kSampleRate);
@@ -45,6 +46,9 @@ stereosample_t AUDIO_FUNC(AudioAppProcess)(stereosample_t y)
     //no sound, just CV
     y.L=y.R=0;
 #endif // FM_SYNTH
+
+    std::vector<float> params { std::abs(y.L) };
+    AnalysisParamsWrite(params);
 
     return y;
 }

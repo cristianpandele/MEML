@@ -18,12 +18,16 @@
 #include <vector>
 
 #include "pico/util/queue.h"
+#include "src/audio/AnalysisParams.hpp"
 
 //for random bits
 #include "hardware/clocks.h"
 #include "hardware/structs/rosc.h"
 
-
+// Core 0->1 comms
+const size_t kSharedMemSize = 1;
+volatile int32_t gSharedMem[kSharedMemSize] { -1 };
+mutex_t mutex_0to1;
 static queue_t queue_audioparam;
 static queue_t queue_interface_pulse;
 static queue_t queue_interface_midi;
@@ -87,6 +91,9 @@ void setup() {
     //Serial.printf("Generated Random Seed: %u\n", seed);
     // Seed the standard PRNG
     srand(seed);
+
+    // Set up the mutex;
+    AnalysisParamsSetup(kAudioApp_NAnalysisParams);
 
     // AUDIO routine setup
     if (!AudioDriver_Output::Setup()) {
@@ -177,7 +184,10 @@ void loop1() {
     counter++;
     if (counter >= count_wraparound) {
         counter = 0;
-        Serial.println(".");
+        //Serial.println(".");
+        std::vector<float> params;
+        AnalysisParamsRead(params);
+        Serial.println(params[0]);
     }
 #endif
 

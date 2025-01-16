@@ -7,6 +7,8 @@
 
 #include <vector>
 
+const size_t kAudioApp_NAnalysisParams = 1;
+
 /**
  * @brief App setup routine, called on board power-up.
  * Insert your audio initialisation code here.
