@@ -8,6 +8,7 @@
 #define FM_SYNTH         1  ///< FM Synth (new macro)
 #define FX_PROCESSOR     0  ///< FX Processor (new macro)
 #define EUCLIDEAN        0
+#define COLLAB_MIXER     0
 
 
 #define AUDIO_FUNC(x)    __not_in_flash_func(x)  ///< Macro to make audio function load from mem
