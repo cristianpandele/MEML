@@ -136,7 +136,8 @@ void ButtonsPots::ProcessButton_(const PinConfig pin_n,
             { toggle_SaveData, toggle_savedata },
             { button_Randomise, button_randomise },
             { toggle_Training, toggle_training },
-            { button_ClearData, button_cleardata }
+            { button_ClearData, button_cleardata },
+            { button_zoomModeSwitch, button_zoommodeswitch }
         };
         auto button_pos = pin_to_button.find(pin_n);
         te_button_idx button_n;
@@ -152,6 +153,7 @@ void ButtonsPots::ProcessButton_(const PinConfig pin_n,
             // Buttons
             case button_Randomise:
             case button_ClearData:
+            case button_zoomModeSwitch:
             {
                 if (state) {
                     // Trigger button action

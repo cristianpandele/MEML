@@ -212,6 +212,24 @@ void MEMLInterface::SetToggleButton(te_button_idx button_n, int8_t state)
                             joystick_current_.as_struct.potRotate });
         } break;
 
+        case button_zoommodeswitch: {
+            Serial.println("chicken");
+            switch (gAppState.current_expl_mode) {
+                case expl_mode_nnweights: {
+                    gAppState.current_expl_mode = expl_mode_pretrain;
+                } break;
+                case expl_mode_pretrain: {
+                    gAppState.current_expl_mode = expl_mode_zoom;
+                } break;
+                case expl_mode_zoom: {
+                    gAppState.current_expl_mode = expl_mode_nnweights;
+                } break;
+                default: {}
+            }
+            Serial.println(static_cast<int>(gAppState.current_expl_mode));
+            // gAppState.current_expl_mode = te_expl_mode[];
+        } break;
+            
         default: {}
     }
 }

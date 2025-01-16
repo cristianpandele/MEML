@@ -48,7 +48,8 @@ typedef enum {
     toggle_explmode,   // 7
     toggle_dataset,    // 8
     toggle_model,      // 9
-    button_nButtons
+    button_nButtons,
+    button_zoommodeswitch
 } te_button_idx;
 
 /** Slider indexes for the MEML interface (legacy) */
