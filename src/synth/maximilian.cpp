@@ -1270,23 +1270,21 @@ void maxiSample::autoTrim(float alpha, float threshold, bool trimStart, bool tri
 // }
 
 
-// //there are a bunch of constructors here. it's a quirk of CHEERP that constructors need to be defined in the cpp unless completely header only
-// maxiRatioSeq::maxiRatioSeq() {}
-// maxiTrigger::maxiTrigger() {}
-// maxiMap::maxiMap() {}
-// maxiNonlinearity::maxiNonlinearity() {}
-// maxiFilter::maxiFilter():x(0.0), y(0.0), z(0.0), c(0.0) {}
-// maxiBiquad::maxiBiquad() {}
-// maxiZeroCrossingDetector::maxiZeroCrossingDetector() {}
-// maxiIndex::maxiIndex() {}
-// maxiZXToPulse::maxiZXToPulse() {}
-// maxiStep::maxiStep() {}
-// maxiSelect::maxiSelect() {}
-// maxiSelectX::maxiSelectX() {}
-// maxiEnvGen::maxiEnvGen() {}
-// maxiRingBuf::maxiRingBuf() {}
-// maxiPoll::maxiPoll() {}
-// maxiRMS::maxiRMS() {}
-// maxiZeroCrossingRate::maxiZeroCrossingRate() {
-// 	buf.setup(maxiSettings::sampleRate);
-// }
+//there are a bunch of constructors here. it's a quirk of CHEERP that constructors need to be defined in the cpp unless completely header only
+maxiRatioSeq::maxiRatioSeq() {}
+maxiTrigger::maxiTrigger() {}
+maxiMap::maxiMap() {}
+maxiFilter::maxiFilter():x(0.0), y(0.0), z(0.0), c(0.0) {}
+maxiZeroCrossingDetector::maxiZeroCrossingDetector() {}
+maxiIndex::maxiIndex() {}
+maxiZXToPulse::maxiZXToPulse() {}
+maxiStep::maxiStep() {}
+maxiSelect::maxiSelect() {}
+maxiSelectX::maxiSelectX() {}
+maxiEnvGen::maxiEnvGen() {}
+maxiRingBuf::maxiRingBuf() {}
+maxiPoll::maxiPoll() {}
+maxiRMS::maxiRMS() {}
+maxiZeroCrossingRate::maxiZeroCrossingRate() {
+	buf.setup(maxiSettings::sampleRate);
+}
