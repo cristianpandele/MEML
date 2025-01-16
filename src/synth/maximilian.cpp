@@ -373,329 +373,123 @@ float maxiOsc::triangle(float frequency) {
 }
 
 
-// //float maxiEnvelope::line(int numberofsegments,float segments[1000]) {
-// float maxiEnvelope::line(int numberofsegments,std::vector<float>& segments) {
-// 	//This is a basic multi-segment ramp generator that you can use for more or less anything.
-// 	//However, it's not that intuitive.
-// 	if (isPlaying==1) {//only make a sound once you've been triggered
-// 		period=4./(segments[valindex+1]*0.0044);
-// 		nextval=segments[valindex+2];
-// 		currentval=segments[valindex];
-// 		if (currentval-amplitude > 0.0000001 && valindex < numberofsegments) {
-// 			amplitude += ((currentval-startval)/(maxiSettings::sampleRate/period));
-// 		} else if (currentval-amplitude < -0.0000001 && valindex < numberofsegments) {
-// 			amplitude -= (((currentval-startval)*(-1))/(maxiSettings::sampleRate/period));
-// 		} else if (valindex >numberofsegments-1) {
-// 			valindex=numberofsegments-2;
-// 		} else {
-// 			valindex=valindex+2;
-// 			startval=currentval;
-// 		}
-// 		output=amplitude;
 
-// 	}
-// 	else {
-// 		output=0;
+//I particularly like these. cutoff between 0 and 1
+float maxiFilter::lopass(float input, float cutoff) {
+	output=outputs[0] + cutoff*(input-outputs[0]);
+	outputs[0]=output;
+	return(output);
+}
 
-// 	}
-// 	return(output);
-// }
+//as above
+float maxiFilter::hipass(float input, float cutoff) {
+	output=input-(outputs[0] + cutoff*(input-outputs[0]));
+	outputs[0]=output;
+	return(output);
+}
+//awesome. cuttof is freq in hz. res is between 1 and whatever. Watch out!
+float maxiFilter::lores(float input,float cutoff1, float resonance) {
+	cutoff=cutoff1;
+	if (cutoff<10) cutoff=10;
+	if (cutoff>(maxiSettings::sampleRate)) cutoff=(maxiSettings::sampleRate);
+	if (resonance<1.) resonance = 1.;
+	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
+	c=2-2*z;
+	float r=(sqrt(2.0)*sqrt(-pow((z-1.0),3.0))+resonance*(z-1))/(resonance*(z-1));
+	x=x+(input-y)*c;
+	y=y+x;
+	x=x*r;
+	output=y;
+	return(output);
+}
 
+//working hires filter
+float maxiFilter::hires(float input,float cutoff1, float resonance) {
+	cutoff=cutoff1;
+	if (cutoff<10) cutoff=10;
+	if (cutoff>(maxiSettings::sampleRate)) cutoff=(maxiSettings::sampleRate);
+	if (resonance<1.) resonance = 1.;
+	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
+	c=2-2*z;
+	float r=(sqrt(2.0)*sqrt(-pow((z-1.0),3.0))+resonance*(z-1))/(resonance*(z-1));
+	x=x+(input-y)*c;
+	y=y+x;
+	x=x*r;
+	output=input-y;
+	return(output);
+}
 
+//This works a bit. Needs attention.
+float maxiFilter::bandpass(float input,float cutoff1, float resonance) {
+	cutoff=cutoff1;
+	if (cutoff>(maxiSettings::sampleRate*0.5)) cutoff=(maxiSettings::sampleRate*0.5);
+	if (resonance>=1.) resonance=0.999999;
+	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
+	inputs[0] = (1-resonance)*(sqrt(resonance*(resonance-4.0*pow(z,2.0)+2.0)+1));
+	inputs[1] = 2*z*resonance;
+	inputs[2] = pow((resonance*-1),2);
 
-// //and this
-// void maxiEnvelope::trigger(int index, float amp) {
-// 	isPlaying=1;//ok the envelope is being used now.
-// 	valindex=index;
-// 	amplitude=amp;
+	output=inputs[0]*input+inputs[1]*outputs[1]+inputs[2]*outputs[2];
+	outputs[2]=outputs[1];
+	outputs[1]=output;
+	return(output);
+}
 
-// }
+//stereo bus
+void maxiMix::stereo(float input,std::vector<float>&two,float x) {
+	if (x>1) x=1;
+	if (x<0) x=0;
+	two[0]=input*sqrt(1.0-x);
+	two[1]=input*sqrt(x);
+//	return two;
+}
 
-// //I particularly like these. cutoff between 0 and 1
-// float maxiFilter::lopass(float input, float cutoff) {
-// 	output=outputs[0] + cutoff*(input-outputs[0]);
-// 	outputs[0]=output;
-// 	return(output);
-// }
+//quad bus
+void maxiMix::quad(float input,std::vector<float>& four,float x,float y) {
+	if (x>1) x=1;
+	if (x<0) x=0;
+	if (y>1) y=1;
+	if (y<0) y=0;
+	four[0]=input*sqrt((1.0-x)*y);
+	four[1]=input*sqrt((1.0-x)*(1.0-y));
+	four[2]=input*sqrt(x*y);
+	four[3]=input*sqrt(x*(1.0-y));
+//	return(four);
+}
 
-// //as above
-// float maxiFilter::hipass(float input, float cutoff) {
-// 	output=input-(outputs[0] + cutoff*(input-outputs[0]));
-// 	outputs[0]=output;
-// 	return(output);
-// }
-// //awesome. cuttof is freq in hz. res is between 1 and whatever. Watch out!
-// float maxiFilter::lores(float input,float cutoff1, float resonance) {
-// 	cutoff=cutoff1;
-// 	if (cutoff<10) cutoff=10;
-// 	if (cutoff>(maxiSettings::sampleRate)) cutoff=(maxiSettings::sampleRate);
-// 	if (resonance<1.) resonance = 1.;
-// 	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
-// 	c=2-2*z;
-// 	float r=(sqrt(2.0)*sqrt(-pow((z-1.0),3.0))+resonance*(z-1))/(resonance*(z-1));
-// 	x=x+(input-y)*c;
-// 	y=y+x;
-// 	x=x*r;
-// 	output=y;
-// 	return(output);
-// }
-
-// //working hires filter
-// float maxiFilter::hires(float input,float cutoff1, float resonance) {
-// 	cutoff=cutoff1;
-// 	if (cutoff<10) cutoff=10;
-// 	if (cutoff>(maxiSettings::sampleRate)) cutoff=(maxiSettings::sampleRate);
-// 	if (resonance<1.) resonance = 1.;
-// 	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
-// 	c=2-2*z;
-// 	float r=(sqrt(2.0)*sqrt(-pow((z-1.0),3.0))+resonance*(z-1))/(resonance*(z-1));
-// 	x=x+(input-y)*c;
-// 	y=y+x;
-// 	x=x*r;
-// 	output=input-y;
-// 	return(output);
-// }
-
-// //This works a bit. Needs attention.
-// float maxiFilter::bandpass(float input,float cutoff1, float resonance) {
-// 	cutoff=cutoff1;
-// 	if (cutoff>(maxiSettings::sampleRate*0.5)) cutoff=(maxiSettings::sampleRate*0.5);
-// 	if (resonance>=1.) resonance=0.999999;
-// 	z=cos(TWOPI*cutoff/maxiSettings::sampleRate);
-// 	inputs[0] = (1-resonance)*(sqrt(resonance*(resonance-4.0*pow(z,2.0)+2.0)+1));
-// 	inputs[1] = 2*z*resonance;
-// 	inputs[2] = pow((resonance*-1),2);
-
-// 	output=inputs[0]*input+inputs[1]*outputs[1]+inputs[2]*outputs[2];
-// 	outputs[2]=outputs[1];
-// 	outputs[1]=output;
-// 	return(output);
-// }
-
-// //stereo bus
-// void maxiMix::stereo(float input,std::vector<float>&two,float x) {
-// 	if (x>1) x=1;
-// 	if (x<0) x=0;
-// 	two[0]=input*sqrt(1.0-x);
-// 	two[1]=input*sqrt(x);
-// //	return two;
-// }
-
-// //quad bus
-// void maxiMix::quad(float input,std::vector<float>& four,float x,float y) {
-// 	if (x>1) x=1;
-// 	if (x<0) x=0;
-// 	if (y>1) y=1;
-// 	if (y<0) y=0;
-// 	four[0]=input*sqrt((1.0-x)*y);
-// 	four[1]=input*sqrt((1.0-x)*(1.0-y));
-// 	four[2]=input*sqrt(x*y);
-// 	four[3]=input*sqrt(x*(1.0-y));
-// //	return(four);
-// }
-
-// //ambisonic bus
-// void maxiMix::ambisonic(float input,std::vector<float>&eight,float x,float y,float z) {
-// 	if (x>1) x=1;
-// 	if (x<0) x=0;
-// 	if (y>1) y=1;
-// 	if (y<0) y=0;
-// 	if (z>1) y=1;
-// 	if (z<0) y=0;
-// 	eight[0]=input*(sqrt((1.0-x)*y)*1.0-z);
-// 	eight[1]=input*(sqrt((1.0-x)*(1.0-y))*1.0-z);
-// 	eight[2]=input*(sqrt(x*y)*1.0-z);
-// 	eight[3]=input*(sqrt(x*(1.0-y))*1.0-z);
-// 	eight[4]=input*(sqrt((1.0-x)*y)*z);
-// 	eight[5]=input*(sqrt((1.0-x)*(1.0-y))*z);
-// 	eight[6]=input*sqrt((x*y)*z);
-// 	eight[7]=input*sqrt((x*(1.0-y))*z);
-// //	return(eight);
-// }
-// // --------------------------------------------------------------------------------
-// // MAXI_SAMPLE
+//ambisonic bus
+void maxiMix::ambisonic(float input,std::vector<float>&eight,float x,float y,float z) {
+	if (x>1) x=1;
+	if (x<0) x=0;
+	if (y>1) y=1;
+	if (y<0) y=0;
+	if (z>1) y=1;
+	if (z<0) y=0;
+	eight[0]=input*(sqrt((1.0-x)*y)*1.0-z);
+	eight[1]=input*(sqrt((1.0-x)*(1.0-y))*1.0-z);
+	eight[2]=input*(sqrt(x*y)*1.0-z);
+	eight[3]=input*(sqrt(x*(1.0-y))*1.0-z);
+	eight[4]=input*(sqrt((1.0-x)*y)*z);
+	eight[5]=input*(sqrt((1.0-x)*(1.0-y))*z);
+	eight[6]=input*sqrt((x*y)*z);
+	eight[7]=input*sqrt((x*(1.0-y))*z);
+}
+// --------------------------------------------------------------------------------
+// MAXI_SAMPLE
 
 
-// maxiSample::maxiSample():position(0), recordPosition(0), myChannels(1), mySampleRate(maxiSettings::sampleRate) {};
-
-// #ifdef VORBIS
-
-// // This is for OGG loading
-// bool maxiSample::loadOgg(string fileName, int channel) {
-//     std::ifstream oggFile(fileName, std::ios::binary);
-//     std::vector<unsigned char> fileContents((std::istreambuf_iterator<char>(oggFile)),
-//                                    std::istreambuf_iterator<char>());
-
-//     return setSampleFromOggBlob(fileContents, channel);
-// 	return 0;
-// }
-
-// int maxiSample::setSampleFromOggBlob(vector<unsigned char> &oggBlob, int channel) {
-//     bool result=0;
-//     readChannel=channel;
-//     int channelx;
-//     short* temp;
-//     int myDataSize = stb_vorbis_decode_memory(oggBlob.data(), oggBlob.size(), &channelx, &temp);
-//     result = myDataSize > 0;
-//     printf("\nchannels = %d\nlength = %d",channelx,myDataSize);
-//     printf("\n");
-//     myChannels=(short)channelx;
-//     mySampleRate=44100;
-//     amplitudes.resize(myDataSize);
-
-//     if (myChannels>1) {
-//         int position=0;
-//         int channel=readChannel;
-//         for (int i=channel;i<myDataSize*2;i+=myChannels) {
-//             amplitudes[position]=temp[i]/32767.0;
-//             position++;
-//         }
-//     }else{
-//         for(int i=0; i < myDataSize; i++) {
-//             amplitudes[i] = temp[i] / 32767.0;
-//         }
-//     }
-//     free(temp);
-
-//     return result; // this should probably be something more descriptive
-//     return 0;
-// }
-// #endif
+maxiSample::maxiSample():position(0), recordPosition(0), myChannels(1), mySampleRate(maxiSettings::sampleRate) {};
 
 
 
-// // -------------------------
+// -------------------------
 
-// //This sets the playback position to the start of a sample
-// void maxiSample::trigger() {
-// 	position = 0;
-// 	recordPosition = 0;
-// }
+//This sets the playback position to the start of a sample
+void maxiSample::trigger() {
+	position = 0;
+	recordPosition = 0;
+}
 
-// #ifndef CHEERP
-
-// //This is the maxiSample load function. It just calls read.
-// bool maxiSample::load(string fileName, int channel) {
-// 	myPath = fileName;
-// 	readChannel=channel;
-// 	return read();
-// }
-
-// //This is the main read function.
-// bool maxiSample::read()
-// {
-//     bool result;
-//     ifstream inFile( myPath.c_str(), ios::in | ios::binary);
-//     cout << "Loading: " << myPath << endl;
-//     result = inFile.is_open();
-//     int myDataSize;
-//     if (result) {
-//         bool datafound = false;
-//         inFile.seekg(4, ios::beg);
-//         inFile.read( (char*) &myChunkSize, 4 ); // read the ChunkSize
-
-//         inFile.seekg(16, ios::beg);
-//         inFile.read( (char*) &mySubChunk1Size, 4 ); // read the SubChunk1Size
-
-//         //inFile.seekg(20, ios::beg);
-//         inFile.read( (char*) &myFormat, sizeof(short) ); // read the file format.  This should be 1 for PCM
-
-//         //inFile.seekg(22, ios::beg);
-//         inFile.read( (char*) &myChannels, sizeof(short) ); // read the # of channels (1 or 2)
-
-//         //inFile.seekg(24, ios::beg);
-//         inFile.read( (char*) &mySampleRate, sizeof(int) ); // read the samplerate
-
-//         //inFile.seekg(28, ios::beg);
-//         inFile.read( (char*) &myByteRate, sizeof(int) ); // read the byterate
-
-//         //inFile.seekg(32, ios::beg);
-//         inFile.read( (char*) &myBlockAlign, sizeof(short) ); // read the blockalign
-
-//         //inFile.seekg(34, ios::beg);
-//         inFile.read( (char*) &myBitsPerSample, sizeof(short) ); // read the bitspersample
-
-//         //ignore any extra chunks
-//         char chunkID[5]="";
-//         chunkID[4] = 0;
-//         int filePos = 20 + mySubChunk1Size;
-//         while(!datafound && !inFile.eof()) {
-//             inFile.seekg(filePos, ios::beg);
-//             inFile.read((char*) &chunkID, sizeof(char) * 4);
-//             inFile.seekg(filePos + 4, ios::beg);
-//             inFile.read( (char*) &myDataSize, sizeof(int) ); // read the size of the data
-//             filePos += 8;
-//             if (strcmp(chunkID,"data") == 0) {
-//                 datafound = true;
-//             }else{
-//                 filePos += myDataSize;
-//             }
-//         }
-
-//         // read the data chunk
-//         vector<short> shortAmps;
-//         shortAmps.resize(myDataSize/2);
-//         inFile.seekg(filePos, ios::beg);
-//         inFile.read((char*)shortAmps.data(), myDataSize);
-//         inFile.close(); // close the input file
-
-//         if (myChannels>1) {
-//             int position=0;
-//             int channel=readChannel*2;
-//             for (int i=channel;i<myDataSize+6;i+=(myChannels*2)) {
-//                 shortAmps[position]=shortAmps[i];
-//                 position++;
-//             }
-//         }
-//         amplitudes.resize(shortAmps.size());
-//         for(size_t i=0; i < shortAmps.size(); i++) {
-//             amplitudes[i] = shortAmps[i] / 32767.0;
-//         }
-//         position = amplitudes.size();
-//         cout << "Ch: " << myChannels << ", len: " << amplitudes.size() << endl;
-
-//     }else {
-//         //        cout << "ERROR: Could not load sample: " <<myPath << endl; //This line seems to be hated by windows
-//         printf("ERROR: Could not load sample.");
-
-//     }
-
-
-//     return result; // this should probably be something more descriptive
-// }
-
-// bool maxiSample::save() {
-//     return save(myPath);
-// }
-
-// bool maxiSample::save(string filename)
-// {
-//     fstream myFile (filename.c_str(), ios::out | ios::binary);
-
-//     vector<short> shortAmps(amplitudes.size());
-//     for(size_t i=0; i < shortAmps.size(); i++) {
-//         shortAmps[i] = static_cast<short>(round(amplitudes[i] * 32767.0));
-//     }
-//     // write the wav file per the wav file format
-//     myFile.seekp (0, ios::beg);
-//     myFile.write ("RIFF", 4);
-//     myFile.write ((char*) &myChunkSize, 4);
-//     myFile.write ("WAVE", 4);
-//     myFile.write ("fmt ", 4);
-//     myFile.write ((char*) &mySubChunk1Size, 4);
-//     myFile.write ((char*) &myFormat, 2);
-//     myFile.write ((char*) &myChannels, 2);
-//     myFile.write ((char*) &mySampleRate, 4);
-//     myFile.write ((char*) &myByteRate, 4);
-//     myFile.write ((char*) &myBlockAlign, 2);
-//     myFile.write ((char*) &myBitsPerSample, 2);
-//     myFile.write ("data", 4);
-//     int myDataSize = shortAmps.size() * 2;
-//     myFile.write ((char*) &myDataSize, 4);
-//     //        myFile.write ((char*) temp, myDataSize);
-//     myFile.write ((char*) shortAmps.data(), myDataSize);
-//     return true;
-// }
 
 // string maxiSample::getSummary()
 // {
@@ -705,462 +499,456 @@ float maxiOsc::triangle(float frequency) {
 //     return ss.str();
 // }
 
-// #endif
-// // -----------------
-
-
-// //This plays back at the correct speed. Always loops.
-// float maxiSample::play() {
-//     output = F64_ARRAY_AT(amplitudes,(long)position);
-//     position++;
-// 		if ((long) position >= F64_ARRAY_SIZE(amplitudes)) {
-// 			position = 0;
-// 		}
-//     return output;
-// }
-
-// void maxiSample::setPosition(float newPos) {
-// 	position = maxiMap::clamp(newPos, 0.0, 1.0) * F64_ARRAY_SIZE(amplitudes);
-// }
-
-// float maxiSample::playWithPhasor(float pha) {
-// 	size_t amplen = F64_ARRAY_SIZE(amplitudes);
-// 	//clamping
-// 	if (pha > 1) pha=1;
-// 	if (pha < 0) pha=0;
-// 	float pos = pha * amplen * 0.99999999999999;
-
-// 	if (phasorFirst) {
-// 		phasorFirst=0;
-// 		phasorPrev = pos;
-// 	}
-
-// 	size_t pos1 = static_cast<size_t>(round(phasorPrev));
-// 	size_t pos2 = static_cast<size_t>(round(pos));
-// 	if (pos1==pos2) {
-// 		if (pos >= phasorPrev) {
-// 			pos2++;
-// 		}else{
-// 			pos1--;
-// 		}
-// 	}
-
-// 	//constraints / wrapping
-// 	if (pos2 >= amplen) {
-// 		pos2=0;
-// 	}
-// 	if (pos1 >= amplen) {
-// 		pos1=0;
-// 	}
-// 	if (pos1 < 0) {
-// 		pos1 = amplen-1;
-// 	}
-// 	if (pos2 < 0) {
-// 		pos2 = amplen-1;
-// 	}
-
-// 	//get interpolation coeffs
-// 	float q1,q2;
-// 	if (pos2 > pos1) {
-// 		float dist = pos2-pos1;
-// 		if (dist == 0)
-// 			q1 = 0;
-// 		else
-// 			q1 = (pos-pos1) / dist;
-// 	}else {
-// 		float dist = (amplen - pos1) + pos2;
-// 		if (dist==0) 
-// 			q1 = 0;
-// 		else{
-// 			if (pos > pos1) {
-// 				q1 = (pos - pos1) / dist;
-// 			}else{
-// 				q1 = ((amplen - pos1) + pos) / dist;
-// 			}
-// 		}
-// 	}
-// 	q2 = 1 - q1;
-
-// 	output = (q1 * F64_ARRAY_AT(amplitudes,pos1) +
-// 							q2 * F64_ARRAY_AT(amplitudes,pos2));
-// 	phasorPrev = pos;
-
-// 	return output;
-// }
-
-
-
-
-
-// // placeholder
-// float maxiSample::playAtSpeedBetweenPoints(float frequency, float start, float end) {
-// 	return playAtSpeedBetweenPointsFromPos(frequency, start, end, position);
-// }
-
-// //This allows you to say how often a second you want a specific chunk of audio to play
-// float maxiSample::playAtSpeedBetweenPointsFromPos(float frequency, float start, float end, float pos) {
-// 	float remainder;
-// 	size_t amplen = F64_ARRAY_SIZE(amplitudes);
-// 	if (end>=amplen) end=amplen-1;
-// 	long a,b;
-
-// 	if (frequency >0.) {
-// 		if (pos<start) {
-// 			pos=start;
-// 		}
-
-// 		if ( pos >= end ) pos = start;
-// 		pos += ((end-start)/((maxiSettings::sampleRate)/(frequency*chandiv)));
-// 		remainder = pos - floor(pos);
-// 		long posl = floor(pos);
-// 		if (posl+1<amplen) {
-// 			a=posl+1;
-// 		}	else {
-// 			a=posl-1;
-// 		}
-// 		if (posl+2<amplen) {
-// 			b=posl+2;
-// 		}
-// 		else {
-// 			b=amplen-1;
-// 		}
-
-// 		output = ((1-remainder) * F64_ARRAY_AT(amplitudes,a) +
-// 						   remainder * F64_ARRAY_AT(amplitudes,b));//linear interpolation
-// 	} else {
-// 		frequency*=-1.;
-// 		if ( pos <= start ) pos = end;
-// 		pos -= ((end-start)/(maxiSettings::sampleRate/(frequency*chandiv)));
-// 		remainder = pos - floor(pos);
-// 		long posl = floor(pos);
-// 		if (posl-1>=0) {
-// 			a=posl-1;
-// 		}
-// 		else {
-// 			a=0;
-// 		}
-// 		if (posl-2>=0) {
-// 			b=posl-2;
-// 		}
-// 		else {
-// 			b=0;
-// 		}
-// 		output = ((-1-remainder) * F64_ARRAY_AT(amplitudes,a) +
-// 						   remainder * F64_ARRAY_AT(amplitudes,b));//linear interpolation
-// 	}
-
-// 	return(output);
-// }
-
-
-// //Same as above. better cubic inerpolation. Cobbled together from various (pd externals, yehar, other places).
-// float maxiSample::play4(float frequency, float start, float end) {
-// 	float remainder;
-// 	float a,b,c,d,a1,a2,a3;
-// 	if (frequency >0.) {
-// 		if (position<start) {
-// 			position=start;
-// 		}
-// 		if ( position >= end ) position = start;
-// 		position += ((end-start)/(maxiSettings::sampleRate/(frequency*chandiv)));
-// 		remainder = position - floor(position);
-// 		if (position>0) {
-// 			a=F64_ARRAY_AT(amplitudes,(int)(floor(position))-1);
-
-// 		} else {
-// 			a=F64_ARRAY_AT(amplitudes,0);
-
-// 		}
-
-// 		b=F64_ARRAY_AT(amplitudes,(long) position);
-// 		if (position<end-2) {
-// 			c=F64_ARRAY_AT(amplitudes,(long) position+1);
-
-// 		} else {
-// 			c=F64_ARRAY_AT(amplitudes,0);
-
-// 		}
-// 		if (position<end-3) {
-// 			d=	F64_ARRAY_AT(amplitudes,(long) position+2);
-
-// 		} else {
-// 			d=F64_ARRAY_AT(amplitudes,0);
-// 		}
-// 		a1 = 0.5f * (c - a);
-// 		a2 = a - 2.5 * b + 2.f * c - 0.5f * d;
-// 		a3 = 0.5f * (d - a) + 1.5f * (b - c);
-// 		output = (((a3 * remainder + a2) * remainder + a1) * remainder + b);
-
-// 	} else {
-// 		frequency*=-1.;
-// 		if ( position <= start ) position = end;
-// 		position -= ((end-start)/(maxiSettings::sampleRate/(frequency*chandiv)));
-// 		remainder = position - floor(position);
-// 		if (position>start && position < end-1) {
-// 			a=F64_ARRAY_AT(amplitudes,(long) position+1);
-
-// 		} else {
-// 			a=F64_ARRAY_AT(amplitudes,0);
-
-// 		}
-
-// 		b=F64_ARRAY_AT(amplitudes,(long) position);
-// 		if (position>start) {
-// 			c=F64_ARRAY_AT(amplitudes,(long) position-1);
-
-// 		} else {
-// 			c=F64_ARRAY_AT(amplitudes,0);
-
-// 		}
-// 		if (position>start+1) {
-// 			d=F64_ARRAY_AT(amplitudes,(long) position-2);
-
-// 		} else {
-// 			d=F64_ARRAY_AT(amplitudes,0);
-// 		}
-// 		a1 = 0.5f * (c - a);
-// 		a2 = a - 2.5 * b + 2.f * c - 0.5f * d;
-// 		a3 = 0.5f * (d - a) + 1.5f * (b - c);
-// 		output = (((a3 * remainder + a2) * -remainder + a1) * -remainder + b);
-
-// 	}
-
-// 	return(output);
-// }
-
-
-// //start end and points are between 0 and 1
-// float maxiSample::playLoop(float start, float end) {
-// 	position++;
-// 	auto sampleLength = F64_ARRAY_SIZE(amplitudes);
-// 	if (position < sampleLength * start) position = sampleLength * start;
-// 	if ((long) position >= sampleLength * end) position = sampleLength * start;
-// 	output = F64_ARRAY_AT(amplitudes,(long)position);
-// 	return output;
-// }
-
-// float maxiSample::playUntil(float end) {
-// 	position++;
-// 	if (end > 1.0) end = 1.0;
-// 	if ((long) position<F64_ARRAY_SIZE(amplitudes) * end)
-// 		output = F64_ARRAY_AT(amplitudes,(long)position);
-// 	else {
-// 		output=0;
-// 	}
-// 	return output;
-// }
-
-
-// //This plays back at the correct speed. Only plays once. To retrigger, you have to manually reset the position
-// float maxiSample::playOnce() {
-// 	if ((long) position<F64_ARRAY_SIZE(amplitudes))
-// 		output = F64_ARRAY_AT(amplitudes,(long)position);
-// 	else {
-// 		output=0;
-// 	}
-// 	position++;
-// 	return output;
-
-// }
-
-// // //Same as above but takes a speed value specified as a ratio, with 1.0 as original speed
-// float maxiSample::playOnceAtSpeed(float speed) {
-// 	float remainder = position - (long) position;
-// 	if ((long) position+1<F64_ARRAY_SIZE(amplitudes))
-// 		output = ((1-remainder) * F64_ARRAY_AT(amplitudes,(long) position) + remainder * 
-// 		F64_ARRAY_AT(amplitudes,1+(long) position));//linear interpolation
-// 	else
-// 		output=0;
-// 	position=position+((speed*chandiv)/(maxiSettings::sampleRate/mySampleRate));
-// 	return(output);
-// }
-
-
-// float maxiSample::playOnZX(float trig) {
-// 	if (zxTrig.onZX(trig)) {
-// 		trigger();
-// 	}
-//   return playOnce();
-// }
-
-// float maxiSample::playOnZXAtSpeed(float trig, float speed) {
-// 	if (zxTrig.onZX(trig)) {
-// 		trigger();
-// 	}
-//   return playOnceAtSpeed(speed);
-// }
-
-// float maxiSample::playOnZXAtSpeedFromOffset(float trig, float speed, float offset) {
-// 	if (zxTrig.onZX(trig)) {
-// 		trigger();
-// 		position = offset * F64_ARRAY_SIZE(amplitudes);
-// 	}
-//   return playOnceAtSpeed(speed);
-// }
-
-// float maxiSample::playOnZXAtSpeedBetweenPoints(float trig, float speed, float offset, float length) {
-// 	if (zxTrig.onZX(trig)) {
-// 		trigger();
-// 		position = offset * F64_ARRAY_SIZE(amplitudes);
-// 	}
-//   return playUntilAtSpeed(offset+length, speed);
-// }
-
-
-// float maxiSample::loopSetPosOnZX(float trig, float pos) {
-// 	if (zxTrig.onZX(trig)) {
-// 		setPosition(pos);
-// 	}
-//     return play();
-// }
-
-
-
-
-// float maxiSample::playUntilAtSpeed(float end, float speed) {
-// 	float remainder = position - (long) position;
-// 	if (end > 1.0) end = 1.0;
-// 	if ((long) position<F64_ARRAY_SIZE(amplitudes) * end)
-// 		output = ((1-remainder) * F64_ARRAY_AT(amplitudes,1+ (long) position) + remainder * 
-// 		F64_ARRAY_AT(amplitudes,2+(long) position));//linear interpolation
-// 	else
-// 		output=0;
-
-// 	position=position+((speed*chandiv)/(maxiSettings::sampleRate/mySampleRate));
-// 	return output;
-// }
-
-// float maxiSample::playAtSpeed(float speed) {
-// 	float remainder = position - (long) position;
-// 	if ((long) position<F64_ARRAY_SIZE(amplitudes)) {
-// 		output = ((1-remainder) * F64_ARRAY_AT(amplitudes,1+ (long) position) + remainder * 
-// 		F64_ARRAY_AT(amplitudes,2+(long) position));//linear interpolation
-// 	}
-// 	else {
-// 		output=0;
-// 	}
-
-// 	position=position+((speed*chandiv)/(maxiSettings::sampleRate/mySampleRate));
-// 	if ((long) position >= F64_ARRAY_SIZE(amplitudes)) {
-// 		position -= F64_ARRAY_SIZE(amplitudes);
-// 	}
-// 	return output;
-// }
-
-
-// // //As above but looping
-// // float maxiSample::play(float speed) {
-// // 	float remainder;
-// // 	long a,b;
-// // 	position=position+((speed*chandiv)/(maxiSettings::sampleRate/mySampleRate));
-// // 	if (speed >=0) {
-
-// // 		if ((long) position>=amplitudes.size()-1) position=1;
-// // 		remainder = position - floor(position);
-// // 		if (position+1<amplitudes.size()) {
-// // 			a=position+1;
-
-// // 		}
-// // 		else {
-// // 			a=amplitudes.size()-1;
-// // 		}
-// // 		if (position+2<amplitudes.size())
-// // 		{
-// // 			b=position+2;
-// // 		}
-// // 		else {
-// // 			b=amplitudes.size()-1;
-// // 		}
-
-// // 		output = ((1-remainder) * amplitudes[a] + remainder * amplitudes[b]);//linear interpolation
-// // 	} else {
-// // 		if ((long) position<0) position=amplitudes.size();
-// // 		remainder = position - floor(position);
-// // 		if (position-1>=0) {
-// // 			a=position-1;
-
-// // 		}
-// // 		else {
-// // 			a=0;
-// // 		}
-// // 		if (position-2>=0) {
-// // 			b=position-2;
-// // 		}
-// // 		else {
-// // 			b=0;
-// // 		}
-// // 		output = ((-1-remainder) * amplitudes[a] + remainder * amplitudes[b]);//linear interpolation
-// // 	}
-// // 	return(output);
-// // }
-
-
-
-// void maxiSample::normalise(float maxLevel) {
-// 	float maxValue = 0;
-// 	for(int i=0; i < F64_ARRAY_SIZE(amplitudes); i++) {
-// 		if (abs(F64_ARRAY_AT(amplitudes,i)) > maxValue) {
-// 			maxValue = abs(F64_ARRAY_AT(amplitudes,i));
-// 		}
-// 	}
-// 	float scale = maxLevel / maxValue;
-// 	for(int i=0; i < F64_ARRAY_SIZE(amplitudes); i++) {
-// 		F64_ARRAY_AT(amplitudes,i) = round(scale * F64_ARRAY_AT(amplitudes,i));
-// 	}
-// }
-
-// void maxiSample::autoTrim(float alpha, float threshold, bool trimStart, bool trimEnd) {
-
-//     size_t startMarker=0;
-//     if(trimStart) {
-//         maxiLagExp<float> startLag(alpha, 0);
-//         while(startMarker < F64_ARRAY_SIZE(amplitudes)) {
-//             startLag.addSample(abs(F64_ARRAY_AT(amplitudes,startMarker)));
-//             if (startLag.value() > threshold) {
-//                 break;
-//             }
-//             startMarker++;
-//         }
-//     }
-
-//     int endMarker = F64_ARRAY_SIZE(amplitudes)-1;
-//     if(trimEnd) {
-//         maxiLagExp<float> endLag(alpha, 0);
-//         while(endMarker > 0) {
-//             endLag.addSample(abs(F64_ARRAY_AT(amplitudes,endMarker)));
-//             if (endLag.value() > threshold) {
-//                 break;
-//             }
-//             endMarker--;
-//         }
-//     }
-
-//     cout << "Autotrim: start: " << startMarker << ", end: " << endMarker << endl;
-
-//     size_t newLength = endMarker - startMarker;
-//     if (newLength > 0) {
-// 				DECLARE_F64_ARRAY(newAmps)
-// 				F64_ARRAY_SETFROM(amplitudes, newAmps);
-//         // vector<float> newAmps(newLength);
-//         for(int i=0; i < newLength; i++) {
-//             newAmps[i] = F64_ARRAY_AT(amplitudes,i+startMarker);
-//         }
-
-//         // amplitudes = newAmps;
-// 				F64_ARRAY_SETFROM(newAmps, amplitudes);
-//         position=0;
-//         recordPosition=0;
-//         //envelope the start
-// 				size_t fadeSize = 100;
-// 				if (F64_ARRAY_SIZE(amplitudes) > fadeSize)
-// 					fadeSize = F64_ARRAY_SIZE(amplitudes);
-//         for(int i=0; i < fadeSize; i++) {
-//             float factor = i / (float) fadeSize;
-//             F64_ARRAY_AT(amplitudes,i) = round(F64_ARRAY_AT(amplitudes,i) * factor);
-//             F64_ARRAY_AT(amplitudes,F64_ARRAY_SIZE(amplitudes) - 1 - i) = round(F64_ARRAY_AT(amplitudes,F64_ARRAY_SIZE(amplitudes) - 1 - i) * factor);
-//         }
-//     }
-// }
+
+//This plays back at the correct speed. Always loops.
+float maxiSample::play() {
+    output = F64_ARRAY_AT(amplitudes,(long)position);
+    position++;
+		if ((long) position >= F64_ARRAY_SIZE(amplitudes)) {
+			position = 0;
+		}
+    return output;
+}
+
+void maxiSample::setPosition(float newPos) {
+	position = maxiMap::clamp(newPos, 0.0, 1.0) * F64_ARRAY_SIZE(amplitudes);
+}
+
+float maxiSample::playWithPhasor(float pha) {
+	size_t amplen = F64_ARRAY_SIZE(amplitudes);
+	//clamping
+	if (pha > 1) pha=1;
+	if (pha < 0) pha=0;
+	float pos = pha * amplen * 0.99999999999999;
+
+	if (phasorFirst) {
+		phasorFirst=0;
+		phasorPrev = pos;
+	}
+
+	size_t pos1 = static_cast<size_t>(round(phasorPrev));
+	size_t pos2 = static_cast<size_t>(round(pos));
+	if (pos1==pos2) {
+		if (pos >= phasorPrev) {
+			pos2++;
+		}else{
+			pos1--;
+		}
+	}
+
+	//constraints / wrapping
+	if (pos2 >= amplen) {
+		pos2=0;
+	}
+	if (pos1 >= amplen) {
+		pos1=0;
+	}
+	if (pos1 < 0) {
+		pos1 = amplen-1;
+	}
+	if (pos2 < 0) {
+		pos2 = amplen-1;
+	}
+
+	//get interpolation coeffs
+	float q1,q2;
+	if (pos2 > pos1) {
+		float dist = pos2-pos1;
+		if (dist == 0)
+			q1 = 0;
+		else
+			q1 = (pos-pos1) / dist;
+	}else {
+		float dist = (amplen - pos1) + pos2;
+		if (dist==0) 
+			q1 = 0;
+		else{
+			if (pos > pos1) {
+				q1 = (pos - pos1) / dist;
+			}else{
+				q1 = ((amplen - pos1) + pos) / dist;
+			}
+		}
+	}
+	q2 = 1 - q1;
+
+	output = (q1 * F64_ARRAY_AT(amplitudes,pos1) +
+							q2 * F64_ARRAY_AT(amplitudes,pos2));
+	phasorPrev = pos;
+
+	return output;
+}
+
+
+
+
+
+// placeholder
+float maxiSample::playAtSpeedBetweenPoints(float frequency, float start, float end) {
+	return playAtSpeedBetweenPointsFromPos(frequency, start, end, position);
+}
+
+//This allows you to say how often a second you want a specific chunk of audio to play
+float maxiSample::playAtSpeedBetweenPointsFromPos(float frequency, float start, float end, float pos) {
+	float remainder;
+	size_t amplen = F64_ARRAY_SIZE(amplitudes);
+	if (end>=amplen) end=amplen-1;
+	long a,b;
+
+	if (frequency >0.) {
+		if (pos<start) {
+			pos=start;
+		}
+
+		if ( pos >= end ) pos = start;
+		pos += ((end-start)/((maxiSettings::sampleRate)/(frequency*chandiv)));
+		remainder = pos - floor(pos);
+		long posl = floor(pos);
+		if (posl+1<amplen) {
+			a=posl+1;
+		}	else {
+			a=posl-1;
+		}
+		if (posl+2<amplen) {
+			b=posl+2;
+		}
+		else {
+			b=amplen-1;
+		}
+
+		output = ((1-remainder) * F64_ARRAY_AT(amplitudes,a) +
+						   remainder * F64_ARRAY_AT(amplitudes,b));//linear interpolation
+	} else {
+		frequency*=-1.;
+		if ( pos <= start ) pos = end;
+		pos -= ((end-start)/(maxiSettings::sampleRate/(frequency*chandiv)));
+		remainder = pos - floor(pos);
+		long posl = floor(pos);
+		if (posl-1>=0) {
+			a=posl-1;
+		}
+		else {
+			a=0;
+		}
+		if (posl-2>=0) {
+			b=posl-2;
+		}
+		else {
+			b=0;
+		}
+		output = ((-1-remainder) * F64_ARRAY_AT(amplitudes,a) +
+						   remainder * F64_ARRAY_AT(amplitudes,b));//linear interpolation
+	}
+
+	return(output);
+}
+
+
+//Same as above. better cubic inerpolation. Cobbled together from various (pd externals, yehar, other places).
+float maxiSample::play4(float frequency, float start, float end) {
+	float remainder;
+	float a,b,c,d,a1,a2,a3;
+	if (frequency >0.) {
+		if (position<start) {
+			position=start;
+		}
+		if ( position >= end ) position = start;
+		position += ((end-start)/(maxiSettings::sampleRate/(frequency*chandiv)));
+		remainder = position - floor(position);
+		if (position>0) {
+			a=F64_ARRAY_AT(amplitudes,(int)(floor(position))-1);
+
+		} else {
+			a=F64_ARRAY_AT(amplitudes,0);
+
+		}
+
+		b=F64_ARRAY_AT(amplitudes,(long) position);
+		if (position<end-2) {
+			c=F64_ARRAY_AT(amplitudes,(long) position+1);
+
+		} else {
+			c=F64_ARRAY_AT(amplitudes,0);
+
+		}
+		if (position<end-3) {
+			d=	F64_ARRAY_AT(amplitudes,(long) position+2);
+
+		} else {
+			d=F64_ARRAY_AT(amplitudes,0);
+		}
+		a1 = 0.5f * (c - a);
+		a2 = a - 2.5 * b + 2.f * c - 0.5f * d;
+		a3 = 0.5f * (d - a) + 1.5f * (b - c);
+		output = (((a3 * remainder + a2) * remainder + a1) * remainder + b);
+
+	} else {
+		frequency*=-1.;
+		if ( position <= start ) position = end;
+		position -= ((end-start)/(maxiSettings::sampleRate/(frequency*chandiv)));
+		remainder = position - floor(position);
+		if (position>start && position < end-1) {
+			a=F64_ARRAY_AT(amplitudes,(long) position+1);
+
+		} else {
+			a=F64_ARRAY_AT(amplitudes,0);
+
+		}
+
+		b=F64_ARRAY_AT(amplitudes,(long) position);
+		if (position>start) {
+			c=F64_ARRAY_AT(amplitudes,(long) position-1);
+
+		} else {
+			c=F64_ARRAY_AT(amplitudes,0);
+
+		}
+		if (position>start+1) {
+			d=F64_ARRAY_AT(amplitudes,(long) position-2);
+
+		} else {
+			d=F64_ARRAY_AT(amplitudes,0);
+		}
+		a1 = 0.5f * (c - a);
+		a2 = a - 2.5 * b + 2.f * c - 0.5f * d;
+		a3 = 0.5f * (d - a) + 1.5f * (b - c);
+		output = (((a3 * remainder + a2) * -remainder + a1) * -remainder + b);
+
+	}
+
+	return(output);
+}
+
+
+//start end and points are between 0 and 1
+float maxiSample::playLoop(float start, float end) {
+	position++;
+	auto sampleLength = F64_ARRAY_SIZE(amplitudes);
+	if (position < sampleLength * start) position = sampleLength * start;
+	if ((long) position >= sampleLength * end) position = sampleLength * start;
+	output = F64_ARRAY_AT(amplitudes,(long)position);
+	return output;
+}
+
+float maxiSample::playUntil(float end) {
+	position++;
+	if (end > 1.0) end = 1.0;
+	if ((long) position<F64_ARRAY_SIZE(amplitudes) * end)
+		output = F64_ARRAY_AT(amplitudes,(long)position);
+	else {
+		output=0;
+	}
+	return output;
+}
+
+
+//This plays back at the correct speed. Only plays once. To retrigger, you have to manually reset the position
+float maxiSample::playOnce() {
+	if ((long) position<F64_ARRAY_SIZE(amplitudes))
+		output = F64_ARRAY_AT(amplitudes,(long)position);
+	else {
+		output=0;
+	}
+	position++;
+	return output;
+
+}
+
+// //Same as above but takes a speed value specified as a ratio, with 1.0 as original speed
+float maxiSample::playOnceAtSpeed(float speed) {
+	float remainder = position - (long) position;
+	if ((long) position+1<F64_ARRAY_SIZE(amplitudes))
+		output = ((1-remainder) * F64_ARRAY_AT(amplitudes,(long) position) + remainder * 
+		F64_ARRAY_AT(amplitudes,1+(long) position));//linear interpolation
+	else
+		output=0;
+	position=position+((speed*chandiv)/(maxiSettings::sampleRate/mySampleRate));
+	return(output);
+}
+
+
+float maxiSample::playOnZX(float trig) {
+	if (zxTrig.onZX(trig)) {
+		trigger();
+	}
+  return playOnce();
+}
+
+float maxiSample::playOnZXAtSpeed(float trig, float speed) {
+	if (zxTrig.onZX(trig)) {
+		trigger();
+	}
+  return playOnceAtSpeed(speed);
+}
+
+float maxiSample::playOnZXAtSpeedFromOffset(float trig, float speed, float offset) {
+	if (zxTrig.onZX(trig)) {
+		trigger();
+		position = offset * F64_ARRAY_SIZE(amplitudes);
+	}
+  return playOnceAtSpeed(speed);
+}
+
+float maxiSample::playOnZXAtSpeedBetweenPoints(float trig, float speed, float offset, float length) {
+	if (zxTrig.onZX(trig)) {
+		trigger();
+		position = offset * F64_ARRAY_SIZE(amplitudes);
+	}
+  return playUntilAtSpeed(offset+length, speed);
+}
+
+
+float maxiSample::loopSetPosOnZX(float trig, float pos) {
+	if (zxTrig.onZX(trig)) {
+		setPosition(pos);
+	}
+    return play();
+}
+
+
+
+
+float maxiSample::playUntilAtSpeed(float end, float speed) {
+	float remainder = position - (long) position;
+	if (end > 1.0) end = 1.0;
+	if ((long) position<F64_ARRAY_SIZE(amplitudes) * end)
+		output = ((1-remainder) * F64_ARRAY_AT(amplitudes,1+ (long) position) + remainder * 
+		F64_ARRAY_AT(amplitudes,2+(long) position));//linear interpolation
+	else
+		output=0;
+
+	position=position+((speed*chandiv)/(maxiSettings::sampleRate/mySampleRate));
+	return output;
+}
+
+float maxiSample::playAtSpeed(float speed) {
+	float remainder = position - (long) position;
+	if ((long) position<F64_ARRAY_SIZE(amplitudes)) {
+		output = ((1-remainder) * F64_ARRAY_AT(amplitudes,1+ (long) position) + remainder * 
+		F64_ARRAY_AT(amplitudes,2+(long) position));//linear interpolation
+	}
+	else {
+		output=0;
+	}
+
+	position=position+((speed*chandiv)/(maxiSettings::sampleRate/mySampleRate));
+	if ((long) position >= F64_ARRAY_SIZE(amplitudes)) {
+		position -= F64_ARRAY_SIZE(amplitudes);
+	}
+	return output;
+}
+
+
+//As above but looping
+float maxiSample::play(float speed) {
+	float remainder;
+	long a,b;
+	position=position+((speed*chandiv)/(maxiSettings::sampleRate/mySampleRate));
+	if (speed >=0) {
+
+		if ((long) position>=amplitudes.size()-1) position=1;
+		remainder = position - floor(position);
+		if (position+1<amplitudes.size()) {
+			a=position+1;
+
+		}
+		else {
+			a=amplitudes.size()-1;
+		}
+		if (position+2<amplitudes.size())
+		{
+			b=position+2;
+		}
+		else {
+			b=amplitudes.size()-1;
+		}
+
+		output = ((1-remainder) * amplitudes[a] + remainder * amplitudes[b]);//linear interpolation
+	} else {
+		if ((long) position<0) position=amplitudes.size();
+		remainder = position - floor(position);
+		if (position-1>=0) {
+			a=position-1;
+
+		}
+		else {
+			a=0;
+		}
+		if (position-2>=0) {
+			b=position-2;
+		}
+		else {
+			b=0;
+		}
+		output = ((-1-remainder) * amplitudes[a] + remainder * amplitudes[b]);//linear interpolation
+	}
+	return(output);
+}
+
+
+
+void maxiSample::normalise(float maxLevel) {
+	float maxValue = 0;
+	for(int i=0; i < F64_ARRAY_SIZE(amplitudes); i++) {
+		if (abs(F64_ARRAY_AT(amplitudes,i)) > maxValue) {
+			maxValue = abs(F64_ARRAY_AT(amplitudes,i));
+		}
+	}
+	float scale = maxLevel / maxValue;
+	for(int i=0; i < F64_ARRAY_SIZE(amplitudes); i++) {
+		F64_ARRAY_AT(amplitudes,i) = round(scale * F64_ARRAY_AT(amplitudes,i));
+	}
+}
+
+void maxiSample::autoTrim(float alpha, float threshold, bool trimStart, bool trimEnd) {
+
+    size_t startMarker=0;
+    if(trimStart) {
+        maxiLagExp<float> startLag(alpha, 0);
+        while(startMarker < F64_ARRAY_SIZE(amplitudes)) {
+            startLag.addSample(abs(F64_ARRAY_AT(amplitudes,startMarker)));
+            if (startLag.value() > threshold) {
+                break;
+            }
+            startMarker++;
+        }
+    }
+
+    int endMarker = F64_ARRAY_SIZE(amplitudes)-1;
+    if(trimEnd) {
+        maxiLagExp<float> endLag(alpha, 0);
+        while(endMarker > 0) {
+            endLag.addSample(abs(F64_ARRAY_AT(amplitudes,endMarker)));
+            if (endLag.value() > threshold) {
+                break;
+            }
+            endMarker--;
+        }
+    }
+    size_t newLength = endMarker - startMarker;
+    if (newLength > 0) {
+				DECLARE_F64_ARRAY(newAmps)
+				F64_ARRAY_SETFROM(amplitudes, newAmps);
+        // vector<float> newAmps(newLength);
+        for(int i=0; i < newLength; i++) {
+            newAmps[i] = F64_ARRAY_AT(amplitudes,i+startMarker);
+        }
+
+        // amplitudes = newAmps;
+				F64_ARRAY_SETFROM(newAmps, amplitudes);
+        position=0;
+        recordPosition=0;
+        //envelope the start
+				size_t fadeSize = 100;
+				if (F64_ARRAY_SIZE(amplitudes) > fadeSize)
+					fadeSize = F64_ARRAY_SIZE(amplitudes);
+        for(int i=0; i < fadeSize; i++) {
+            float factor = i / (float) fadeSize;
+            F64_ARRAY_AT(amplitudes,i) = round(F64_ARRAY_AT(amplitudes,i) * factor);
+            F64_ARRAY_AT(amplitudes,F64_ARRAY_SIZE(amplitudes) - 1 - i) = round(F64_ARRAY_AT(amplitudes,F64_ARRAY_SIZE(amplitudes) - 1 - i) * factor);
+        }
+    }
+}
 
 
 
