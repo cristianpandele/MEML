@@ -9,6 +9,8 @@
 #include "src/synth/matrixMix.hpp"
 #elif EUCLIDEAN
 #include "src/synth/EuclideanSeq.hpp"
+#elif COLLAB_MIXER
+#include "src/synth/CollabMixer.hpp"
 #endif  
 
 #include "src/interface/MEMLInterface.hpp"

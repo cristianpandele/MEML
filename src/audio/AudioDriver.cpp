@@ -175,7 +175,7 @@ bool AudioDriver_Output::Setup() {
     Serial.printf("System Clock: %lu\n", clock_get_hz(clk_sys));
 
     i2s_config picoI2SConfig {
-        kSampleRate, // 48000,
+        kSampleRate, // 8000,
         256,
         bitsPerSample, // 32,
         i2s_pMCLK, // 10,
