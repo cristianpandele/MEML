@@ -568,7 +568,7 @@ public:
     bool isReady() {return F64_ARRAY_SIZE(amplitudes) > 1;}
 
     /*! Set the sample from an external array \param _sampleData An float array (JS) or vector (C++) of data*/
-    void setSample(DOUBLEARRAY_REF _sampleData)
+    void setSample(const DOUBLEARRAY_REF _sampleData)
     {
         // NORMALISE_ARRAY_TYPE(_sampleData, sampleData)
         // amplitudes = sampleData;
