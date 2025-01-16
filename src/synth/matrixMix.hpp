@@ -6,6 +6,7 @@
 #include <array>
 #include "maximilian.h"
 #include "OnePoleSmoother.hpp"
+#include "AudioSample.h"
 
 #define PERIODIC_DEBUG(COUNT, FUNC) \
         static size_t ct=0; \
@@ -100,12 +101,22 @@ private:
 
 class MaxtrixMixApp {
 public:
+    std::vector <maxiSample> sample;
+    std::vector<float> mixerOutput;
+    std::vector<float> gains;
+    // maxiBiquad filter;
 
-    MaxtrixMixApp(size_t sample_rate): smoother_(100.f, sample_rate) {
+    MaxtrixMixApp(size_t sample_rate) : smoother_(100.f, sample_rate)
+    {
         mmix.setDirectFeedbackScaling(0.0);
         unsmoothParams.resize(kN_synthparams);
         params.resize(kN_synthparams);
-                
+        // Set sample playback buffers and gains
+        for (int i = 0; i < audioSample.size(); i++) {
+            sample.push_back(maxiSample());
+            gains.push_back(1.0f/(float)audioSample.size());
+            sample[i].setSample(audioSample[i]);
+        }
     }
 
     static void GenParams(std::vector<float> &param_vector)
@@ -120,48 +131,11 @@ public:
 
     float play(float x) {
         smoother_.Process(unsmoothParams.data(), params.data());
-
-        mmix.set(params);
-        const size_t ofs = NFX*NFX; //offset from mixer params
-        fxInputs[0] = x * params[ofs+0] * params[ofs+0];
-        fxInputs[1] = x * params[ofs+1] * params[ofs+1];
-        fxInputs[2] = x * params[ofs+2] * params[ofs+2];
-        fxInputs[3] = x * params[ofs+3] * params[ofs+3];
-
-
-        float flangeInput = (mmix.calculateMix(fxOutputs, 0) + fxInputs[0]);
-        float flange = flanger.flange(flangeInput, params[ofs+4] * 10000 + 100, params[ofs+5] * 0.99, params[ofs+6] * 0.99f, params[ofs+7]);
-
-        // // float distInput = (mmix.calculateMix(fxOutputs, 1) + fxInputs[1]) * 0.5;
-        // // float dist = distortion.fastAtanDist(distInput, params[ofs+8] * 2);
-        
-
-        float filterInput = (mmix.calculateMix(fxOutputs, 1) + fxInputs[1]) * 0.5;
-        float filtered = filt.play(filterInput);
-
-        // // PERIODIC_DEBUG(3000,
-        // //     printf("%f\t%f\t%f\n", rmMod, rmInput, params[ofs+8]);
-        // // )
-        // float delayInput2 = (mmix.calculateMix(fxOutputs,1) + fxInputs[1]) * 0.5;
-        // float delayed2 = dl.play(delayInput2, params[ofs+3] * 10000 + 100, params[ofs+8] * 0.95);
-
-
-        float delayInput = (mmix.calculateMix(fxOutputs, 2) + fxInputs[2]) * 0.5;
-        float delayed = dl.play(delayInput, params[ofs+9] * 10000 + 100, params[ofs+10] * 0.95);
-
-
-        float rmMod = sinosc.sinebuf(1.f + (params[ofs+11] * params[ofs+11] * 800));
-        float rmInput = (mmix.calculateMix(fxOutputs, 3) + fxInputs[3]) * 0.5;
-        float rmSig = rmInput * rmMod;
-        
-        fxOutputs[0] = flange;
-        fxOutputs[1] = filtered;
-        fxOutputs[2] = delayed;
-        fxOutputs[3] = rmSig;
-
-        // x = fxOutputs[0] + fxOutputs[1] + fxOutputs[2];
-        x = fxOutputs[0] + fxOutputs[1] + fxOutputs[2] + fxOutputs[3];
-        // // x = flanger.flange(flangeInput, params[ofs+4] * 6000 + 100, params[ofs+5] * 0.98, params[ofs+6] * 0.95f, params[ofs+7]);
+        x = 0;
+        for (int i = 0; i < audioSample.size(); i++) {
+            x += sample[i].play()*gains[i];
+        }
+        // x =filter.play(x);
         return x;
     }
 
