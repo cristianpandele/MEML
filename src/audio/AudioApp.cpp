@@ -7,7 +7,10 @@
 #include "../synth/matrixMix.hpp"
 #elif EUCLIDEAN
 #include "../synth/EuclideanSeq.hpp"
+#elif COLLAB_MIXER
+#include "../synth/CollabMixer.hpp"
 #endif
+
 #include <vector>
 
 #include <cmath>

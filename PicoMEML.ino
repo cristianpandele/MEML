@@ -60,6 +60,8 @@ MEMLInterface meml_interface(
     &MaxtrixMixApp::GenParams,
 #elif EUCLIDEAN
     &EuclideanSeqApp::GenParams,
+#elif COLLAB_MIXER
+    &CollabMixer::GenParams,
 #endif  // FM_SYNTH
     kN_synthparams
 );
