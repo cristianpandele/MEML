@@ -511,191 +511,179 @@ private:
 };
 
 
-// /**
-//  * A sampler
-//  */
-// class CHEERP_EXPORT maxiSample
-// {
+/**
+ * A sampler
+ */
+class maxiSample
+{
 
-// private:
-//     float position, recordPosition;
-//     float speed;
-//     float output;
-//     maxiLagExp<float> loopRecordLag;
-//     // DualModeF64Array test;
+private:
+    float position, recordPosition;
+    float speed;
+    float output;
+    maxiLagExp<float> loopRecordLag;
+    // DualModeF64Array test;
 
-// public:
-//     short myChannels;
-//     int mySampleRate;
-//     /*!\returns The length of the sample, in samples*/
-//     inline size_t getLength() { return F64_ARRAY_SIZE(amplitudes); };
-//     short myBitsPerSample;
-//     maxiTrigger zxTrig;
+public:
+    short myChannels;
+    int mySampleRate;
+    /*!\returns The length of the sample, in samples*/
+    inline size_t getLength() { return F64_ARRAY_SIZE(amplitudes); };
+    short myBitsPerSample;
+    maxiTrigger zxTrig;
 
 
-//     DECLARE_F64_ARRAY(amplitudes);
+    DECLARE_F64_ARRAY(amplitudes);
 
-//     maxiSample();
+    maxiSample();
 
-// #ifndef CHEERP
-//     /*! Use the = operator to copy from one sample to another \param source another maxiSample instance*/
-//     maxiSample &operator=(const maxiSample &source)
-//     {
-//         if (this == &source)
-//             return *this;
-//         position = 0;
-//         recordPosition = 0;
-//         myChannels = source.myChannels;
-//         mySampleRate = maxiSettings::sampleRate;
-//         F64_ARRAY_SETFROM(amplitudes,source.amplitudes);
-//         return *this;
-//     }
+    /*! Use the = operator to copy from one sample to another \param source another maxiSample instance*/
+    maxiSample &operator=(const maxiSample &source)
+    {
+        if (this == &source)
+            return *this;
+        position = 0;
+        recordPosition = 0;
+        myChannels = source.myChannels;
+        mySampleRate = maxiSettings::sampleRate;
+        F64_ARRAY_SETFROM(amplitudes,source.amplitudes);
+        return *this;
+    }
 
-//     string myPath;
-//     int myChunkSize;
-//     int mySubChunk1Size;
-//     int readChannel;
-//     short myFormat;
-//     int myByteRate;
-//     short myBlockAlign;
+    string myPath;
+    int myChunkSize;
+    int mySubChunk1Size;
+    int readChannel;
+    short myFormat;
+    int myByteRate;
+    short myBlockAlign;
 
-//     /*! Load a mono channel from a file in wav format \param fileName the file name \param channel the index of the channel to read*/
-//     bool load(string fileName, int channel = 0);
-//     /*! Save the file */
-//     bool save();
-//     /*! Save the file, specifying a file name \param filename The file name*/
-//     bool save(string filename);
-//     // read a wav file into this class
-//     bool read();
 
 //     /*! \returns a printable summary of the wav file */
-//     string getSummary();
+    // string getSummary();
 
-// #endif
-// #ifdef VORBIS
-//     bool loadOgg(string filename, int channel = 0);
-//     int setSampleFromOggBlob(vector<unsigned char> &oggBlob, int channel = 0);
-// #endif
-//     // -------------------------
+    // -------------------------
 
-//     /*! Check if the sample is loaded \returns true if the sample is ready to play*/
-//     bool isReady() {return F64_ARRAY_SIZE(amplitudes) > 1;}
+    /*! Check if the sample is loaded \returns true if the sample is ready to play*/
+    bool isReady() {return F64_ARRAY_SIZE(amplitudes) > 1;}
 
-//     /*! Set the sample from an external array \param _sampleData An float array (JS) or vector (C++) of data*/
-//     void setSample(DOUBLEARRAY_REF _sampleData)
-//     {
-//         // NORMALISE_ARRAY_TYPE(_sampleData, sampleData)
-//         // amplitudes = sampleData;
-//         F64_ARRAY_SETFROM(amplitudes, _sampleData);
-//         // amplitudes.setFrom(_sampleData);
-//         mySampleRate = 44100;
-//         position = F64_ARRAY_SIZE(amplitudes) - 1;
-//     }
+    /*! Set the sample from an external array \param _sampleData An float array (JS) or vector (C++) of data*/
+    void setSample(DOUBLEARRAY_REF _sampleData)
+    {
+        // NORMALISE_ARRAY_TYPE(_sampleData, sampleData)
+        // amplitudes = sampleData;
+        F64_ARRAY_SETFROM(amplitudes, _sampleData);
+        // amplitudes.setFrom(_sampleData);
+        mySampleRate = 44100;
+        position = F64_ARRAY_SIZE(amplitudes) - 1;
+    }
 
-//     /*! Set the sample from an external array, and set the sample rate 
-//      * \param _sampleData An float array (JS) or vector (C++) of data
-//      * \param sampleRate the sample rate
-//      */
-//     void setSampleAndRate(DOUBLEARRAY_REF _sampleData, int sampleRate)
-//     {
-//         setSample(_sampleData);
-//         mySampleRate = sampleRate;
-//     }
+    /*! Set the sample from an external array, and set the sample rate 
+     * \param _sampleData An float array (JS) or vector (C++) of data
+     * \param sampleRate the sample rate
+     */
+    void setSampleAndRate(DOUBLEARRAY_REF _sampleData, int sampleRate)
+    {
+        setSample(_sampleData);
+        mySampleRate = sampleRate;
+    }
 
-//     /*! Clear the sample data*/
-//     void clear() { F64_ARRAY_CLEAR(amplitudes) }
-//     // // -------------------------
+    /*! Clear the sample data*/
+    void clear() { F64_ARRAY_CLEAR(amplitudes) }
+    // // -------------------------
 
 
-//     /*! Trigger the sample from the start*/
-//     void trigger();
+    /*! Trigger the sample from the start*/
+    void trigger();
 
-//     /**
-//      * Record into the sample buffer
-//      * \param newSample a signal
-//      * \param recordEnabled set to true to record into the loop
-//      * \param recordMix the balance between existing sample and the new signal (1 = overdub, 0=no recording, 0.5=equal mix)
-//      * \param start the loop start point (0-1)
-//      * \param end the loop end point (0-1)
-//      */
-//     void loopRecord(float newSample, const bool recordEnabled, const float recordMix, float start, float end)
-//     {
-//         loopRecordLag.addSample(recordEnabled);
-//         if (recordPosition < start * F64_ARRAY_SIZE(amplitudes))
-//             recordPosition = start * F64_ARRAY_SIZE(amplitudes);
-//         if (recordEnabled)
-//         {
-//             float currentSample = F64_ARRAY_AT(amplitudes,(int)recordPosition) / 32767.0;
-//             newSample = (recordMix * currentSample) + ((1.0 - recordMix) * newSample);
-//             newSample *= loopRecordLag.value();
-//             amplitudes[(unsigned long)recordPosition] = newSample * 32767;
-//         }
-//         ++recordPosition;
-//         if (recordPosition >= end * F64_ARRAY_SIZE(amplitudes))
-//             recordPosition = start * F64_ARRAY_SIZE(amplitudes);
-//     }
+    /**
+     * Record into the sample buffer
+     * \param newSample a signal
+     * \param recordEnabled set to true to record into the loop
+     * \param recordMix the balance between existing sample and the new signal (1 = overdub, 0=no recording, 0.5=equal mix)
+     * \param start the loop start point (0-1)
+     * \param end the loop end point (0-1)
+     */
+    void loopRecord(float newSample, const bool recordEnabled, const float recordMix, float start, float end)
+    {
+        loopRecordLag.addSample(recordEnabled);
+        if (recordPosition < start * F64_ARRAY_SIZE(amplitudes))
+            recordPosition = start * F64_ARRAY_SIZE(amplitudes);
+        if (recordEnabled)
+        {
+            float currentSample = F64_ARRAY_AT(amplitudes,(int)recordPosition) / 32767.0;
+            newSample = (recordMix * currentSample) + ((1.0 - recordMix) * newSample);
+            newSample *= loopRecordLag.value();
+            amplitudes[(unsigned long)recordPosition] = newSample * 32767;
+        }
+        ++recordPosition;
+        if (recordPosition >= end * F64_ARRAY_SIZE(amplitudes))
+            recordPosition = start * F64_ARRAY_SIZE(amplitudes);
+    }
 
-//     /*! Reset the sample to play from the start*/
-//     void reset() {position=0;}
+    /*! Reset the sample to play from the start*/
+    void reset() {position=0;}
 
-//     /*! Play the sample, with no modification */
-//     float play();
-
-//     /*! Play the sample, providing a phasor to control the position \param pha a phasor signal (from 0 to 1)*/
-//     float playWithPhasor(float pha);
-//     bool phasorFirst=1;
-//     float phasorPrev=0;
-
-//     /*! Play the sample in a loop \param start start position (0-1) \param end end position (0-1)*/
-//     float playLoop(float start, float end); // start and end are between 0.0 and 1.0
-
-//     /*! Play the sample once and stop*/
-//     float playOnce();
-
-//     /*! Play the sample when a trigger is received \param trigger a signal*/
-//     float playOnZX(float trigger);
-
-//     /*! Play the sample when a trigger is received, at a modified speed \param trigger a signal \param speed the speed multiplier (1=no change, 2=float etc)*/
-//     float playOnZXAtSpeed(float trig, float speed); //API CHANGE
-//     /*! Play the sample when a trigger is received, at a modified speed from a specific position \param trigger a signal \param speed the speed multiplier (1=no change, 2=float etc) \param offset the start position (0-1)*/
-//     float playOnZXAtSpeedFromOffset(float trig, float speed, float offset); //API CHANGE
-//     /*! Play the sample when a trigger is received, at a modified speed beween two positions \param trigger a signal \param speed the speed multiplier (1=no change, 2=float etc) \param offset the start position (0-1) \param length the length of the segment (0-1)*/
-//     float playOnZXAtSpeedBetweenPoints(float trig, float speed, float offset, float length); //API CHANGE
-
-//     /*! Loop the sample, and set the playback position to a specific point when a trigger is received \param trigger a signal \param position the position to move to when a trigger is recevied*/
-//     float loopSetPosOnZX(float trigger, float position); // position between 0 and 1.0
-
-//     /*! Play the samples once, at a modified speed \param speed a speed multiplier*/
-//     float playOnceAtSpeed(float speed); //API CHANGE
-
-//     /*! Set the playback position \param newPos (0-1)*/
-//     void setPosition(float newPos); // between 0.0 and 1.0
-
-//     /*! Play from the start to a specific position \param end the end point (0-1)*/
-//     float playUntil(float end);
-//     /*! Play from the start to a specific position, at a modified speed \param end the end point (0-1) \param speed a speed multiplier*/    
-//     float playUntilAtSpeed(float end, float speed);
-
-//     /*! Play at a modified speed \param speed a speed multiplier*/
-//     float playAtSpeed(float speed); //API CHANGE
+    /*! Play the sample, with no modification */
+    float play();
+    float play(float speed);
 
 
-//     /*! Play at a modified speed between two points, from a position \param frequency the playback pitch (in Hz) \param start the start point (in samples) \param end the end point (in samples) \param pos the starting position (in samples)*/
-//     float playAtSpeedBetweenPointsFromPos(float frequency, float start, float end, float pos); //API CHANGE
+    /*! Play the sample, providing a phasor to control the position \param pha a phasor signal (from 0 to 1)*/
+    float playWithPhasor(float pha);
+    bool phasorFirst=1;
+    float phasorPrev=0;
 
-//     /*! Play at a modified speed between two points \param frequency the playback pitch (in Hz) \param start the start point (in samples) \param end the end point (in samples)*/
-//     float playAtSpeedBetweenPoints(float frequency, float start, float end); //API CHANGE
+    /*! Play the sample in a loop \param start start position (0-1) \param end end position (0-1)*/
+    float playLoop(float start, float end); // start and end are between 0.0 and 1.0
 
-//     /*! Play at a modified speed between two points, using quadratic interpolation \param frequency the playback pitch (in Hz) \param start the start point (in samples) \param end the end point (in samples)*/
-//     float play4(float frequency, float start, float end);
+    /*! Play the sample once and stop*/
+    float playOnce();
+
+    /*! Play the sample when a trigger is received \param trigger a signal*/
+    float playOnZX(float trigger);
+
+    /*! Play the sample when a trigger is received, at a modified speed \param trigger a signal \param speed the speed multiplier (1=no change, 2=float etc)*/
+    float playOnZXAtSpeed(float trig, float speed); //API CHANGE
+    /*! Play the sample when a trigger is received, at a modified speed from a specific position \param trigger a signal \param speed the speed multiplier (1=no change, 2=float etc) \param offset the start position (0-1)*/
+    float playOnZXAtSpeedFromOffset(float trig, float speed, float offset); //API CHANGE
+    /*! Play the sample when a trigger is received, at a modified speed beween two positions \param trigger a signal \param speed the speed multiplier (1=no change, 2=float etc) \param offset the start position (0-1) \param length the length of the segment (0-1)*/
+    float playOnZXAtSpeedBetweenPoints(float trig, float speed, float offset, float length); //API CHANGE
+
+    /*! Loop the sample, and set the playback position to a specific point when a trigger is received \param trigger a signal \param position the position to move to when a trigger is recevied*/
+    float loopSetPosOnZX(float trigger, float position); // position between 0 and 1.0
+
+    /*! Play the samples once, at a modified speed \param speed a speed multiplier*/
+    float playOnceAtSpeed(float speed); //API CHANGE
+
+    /*! Set the playback position \param newPos (0-1)*/
+    void setPosition(float newPos); // between 0.0 and 1.0
+
+    /*! Play from the start to a specific position \param end the end point (0-1)*/
+    float playUntil(float end);
+    /*! Play from the start to a specific position, at a modified speed \param end the end point (0-1) \param speed a speed multiplier*/    
+    float playUntilAtSpeed(float end, float speed);
+
+    /*! Play at a modified speed \param speed a speed multiplier*/
+    float playAtSpeed(float speed); //API CHANGE
 
 
-//     /*! Normalise the sample buffer \param maxLevel the maximum absolute level*/
-//     void normalise(float maxLevel);                                            
+    /*! Play at a modified speed between two points, from a position \param frequency the playback pitch (in Hz) \param start the start point (in samples) \param end the end point (in samples) \param pos the starting position (in samples)*/
+    float playAtSpeedBetweenPointsFromPos(float frequency, float start, float end, float pos); //API CHANGE
 
-//     /*! Trim the sample buffer to remove silence from the ends \param alpha the sensitivity \param threshold the value above which to start trimming \param trimStart true if the start should be trimmed \param trimEnd true if the end should be trimmed */
-//     void autoTrim(float alpha, float threshold, bool trimStart, bool trimEnd); //alpha of lag filter (lower == slower reaction), threshold to mark start and end, < 32767
-// };
+    /*! Play at a modified speed between two points \param frequency the playback pitch (in Hz) \param start the start point (in samples) \param end the end point (in samples)*/
+    float playAtSpeedBetweenPoints(float frequency, float start, float end); //API CHANGE
+
+    /*! Play at a modified speed between two points, using quadratic interpolation \param frequency the playback pitch (in Hz) \param start the start point (in samples) \param end the end point (in samples)*/
+    float play4(float frequency, float start, float end);
+
+
+    /*! Normalise the sample buffer \param maxLevel the maximum absolute level*/
+    void normalise(float maxLevel);                                            
+
+    /*! Trim the sample buffer to remove silence from the ends \param alpha the sensitivity \param threshold the value above which to start trimming \param trimStart true if the start should be trimmed \param trimEnd true if the end should be trimmed */
+    void autoTrim(float alpha, float threshold, bool trimStart, bool trimEnd); //alpha of lag filter (lower == slower reaction), threshold to mark start and end, < 32767
+};
 
 /**
  * Various mapping functions
