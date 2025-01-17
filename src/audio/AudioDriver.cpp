@@ -189,7 +189,8 @@ bool AudioDriver_Output::Setup() {
     // init i2c
     codecCtl.enable();
     codecCtl.volume(0.8);
-    codecCtl.inputSelect(AUDIO_INPUT_LINEIN);
+    codecCtl.inputSelect(AUDIO_INPUT_MIC);
+    codecCtl.micGain(40);
     codecCtl.lineInLevel(7);
 
 
