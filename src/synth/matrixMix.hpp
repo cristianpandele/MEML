@@ -105,10 +105,18 @@ private:
 
 class MaxtrixMixApp {
 public:
-    std::vector <maxiSample> sample;
+    std::array <maxiSample, 5> sample;
     std::vector<float> mixerOutput;
-    std::vector<float> gains;
-    // maxiBiquad filter;
+    static const size_t kNFilters = 5;
+    const std::vector<std::vector<float>> desiredGains{
+        {1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 1.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 1.0f, 0.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 1.0f, 0.0f},
+        {0.0f, 0.0f, 0.0f, 0.0f, 1.0f}};
+    maxiBiquad filters_[kNFilters];
+    maxiRMS rms_[kNFilters];
+    static constexpr float filter_cutoffs_[kNFilters] { 70.f, 100.f, 130.f, 180.f, 250.f };
 
     MaxtrixMixApp(size_t sample_rate) : smoother_(100.f, sample_rate)
     {
@@ -117,9 +125,13 @@ public:
         params.resize(kN_synthparams);
         // Set sample playback buffers and gains
         for (int i = 0; i < audioSample.size(); i++) {
-            sample.push_back(maxiSample());
-            gains.push_back(1.0f/(float)audioSample.size());
+            //sample.push_back(maxiSample());
             sample[i].setSample(audioSample[i]);
+        }
+        // Init filters
+        for (size_t n = 0; n < kNFilters; n++) {
+            filters_[n].set(maxiBiquad::BANDPASS, filter_cutoffs_[n], 0.71f, 1.f);
+            rms_[n].setup(60.0f, 50.0f);
         }
     }
 
@@ -135,11 +147,64 @@ public:
 
     float play(float x) {
         smoother_.Process(unsmoothParams.data(), params.data());
+
+        static constexpr enum PinConfig trainingButtons[]{
+            trainClass_0,
+            trainClass_1,
+            trainClass_2,
+            trainClass_3,
+            trainClass_4};
+
+        bool inTraining = digitalRead(toggle_Training);
+
+        if(digitalRead(button_Randomise))
+        {
+          mlp_draw(1.0f);
+        }
+
+        // Process filterbank
+        std::vector<float> filterbank_out(kNFilters);
+        std::vector<float> rms_out(kNFilters);
+        for (size_t n = 0; n < kNFilters; n++) {
+          filterbank_out[n] = filters_[n].play(x);
+          rms_out[n] = rms_[n].play(filterbank_out[n]);
+        }
+
+        // if (gAppState.current_nn_mode == mode_training)
+        // {
+        //     mlp_train();
+        //     mlp_inference({joystick_current_.as_struct.potX,
+        //                     joystick_current_.as_struct.potY,
+        //                     joystick_current_.as_struct.potRotate});
+        // }
+        // gAppState.current_nn_mode = static_cast<te_nn_mode>(inTraining);
+        // digitalWrite(led_Training, gAppState.current_nn_mode);
+
+        if (inTraining)
+        {
+            // Set the LED
+            int8_t trainingIx = -1;
+            for (size_t n = 0; n < kNFilters; n++)
+            {
+                if (digitalRead(trainingButtons[n]))
+                {
+                    trainingIx = n;
+                    break;
+                }
+            }
+            if (trainingIx != -1)
+            {
+                mlp_add_data_point(rms_out, desiredGains[trainingIx]);
+            }
+        }
+
+        AnalysisParamsWrite(rms_out);
+
         x = 0;
         for (int i = 0; i < audioSample.size(); i++) {
-            x += sample[i].play()*gains[i];
+            x += sample[i].play()*params[i];
         }
-        // x =filter.play(x);
+        PERIODIC_DEBUG(96000, for (auto &v : params) { Serial.printf("%f\t", v); } Serial.println();)
         return x;
     }
 
