@@ -25,7 +25,7 @@ void ButtonsPots::Setup(bool button_isr)
         pinMode(gpio_idx, INPUT_PULLUP);
         // Set up ISR
         if (button_isr) {
-            attachInterrupt(digitalPinToInterrupt(gpio_idx), ButtonISR, CHANGE);
+            //attachInterrupt(digitalPinToInterrupt(gpio_idx), ButtonISR, CHANGE);
         }
     }
     // Set analogue as ADC
@@ -67,7 +67,7 @@ void ButtonsPots::Process(void)
                     _sat(pot_state_[n] * kPotScaling));
         }
     }
-    if (pot_changed) {
+    if (false) { //(pot_changed) {
         ts_joystick_read joystick_read {
             _sat(pot_state_[0] * kPotScaling),
             _sat(pot_state_[1] * kPotScaling),
@@ -133,11 +133,11 @@ void ButtonsPots::ProcessButton_(const PinConfig pin_n,
 
         // Map pin numbers to correct button indexes
         static const std::map<PinConfig, te_button_idx> pin_to_button {
-            { toggle_SaveData, toggle_savedata },
+            // { toggle_SaveData, toggle_savedata },
             { button_Randomise, button_randomise },
             { toggle_Training, toggle_training },
-            { button_ClearData, button_cleardata },
-            { button_zoomModeSwitch, button_zoommodeswitch }
+            // { button_ClearData, button_cleardata },
+            // { button_zoomModeSwitch, button_zoommodeswitch }
         };
         auto button_pos = pin_to_button.find(pin_n);
         te_button_idx button_n;
@@ -152,8 +152,8 @@ void ButtonsPots::ProcessButton_(const PinConfig pin_n,
         switch(pin_n) {
             // Buttons
             case button_Randomise:
-            case button_ClearData:
-            case button_zoomModeSwitch:
+            // case button_ClearData:
+            // case button_zoomModeSwitch:
             {
                 if (state) {
                     // Trigger button action
@@ -161,7 +161,7 @@ void ButtonsPots::ProcessButton_(const PinConfig pin_n,
                 }
             } break;
             // Toggles
-            case toggle_SaveData:
+            // case toggle_SaveData:
             case toggle_Training:
             {
                 // Trigger toggle action

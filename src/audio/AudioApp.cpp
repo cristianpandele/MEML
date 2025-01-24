@@ -47,8 +47,8 @@ stereosample_t AUDIO_FUNC(AudioAppProcess)(stereosample_t y)
     y.L=y.R=0;
 #endif // FM_SYNTH
 
-    std::vector<float> params { std::abs(y.L) };
-    AnalysisParamsWrite(params);
+    //std::vector<float> params { std::abs(y.L) };
+    //AnalysisParamsWrite(params);
 
     return y;
 }

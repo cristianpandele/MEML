@@ -18,7 +18,8 @@
 /**
  * @brief Pin configuration on the Pi Pico 2
  */
-enum PinConfig {
+enum PinConfig
+{
     i2c_sgt5000Data = 0,
     i2c_sgt5000Clk = 1,
     led_Training = 2,
@@ -31,28 +32,29 @@ enum PinConfig {
     i2s_pBCLK = 8,
     i2s_pWS = 9,
     i2s_pMCLK = 10,
-    toggle_SaveData = 13,
-    button_Randomise = 14,
+    button_Randomise = 11,
+    trainClass_0 = 12,
+    trainClass_1 = 13,
+    trainClass_2 = 14,
     toggle_Training = 15,
-    button_ClearData = 16,
+    trainClass_3 = 16,
+    trainClass_4 = 17,
     led_MIDI = 21,
     button_ZoomOut = 18,
     button_ZoomIn = 19,
     pot_JoystickX = 26,
     pot_JoystickY = 27,
-    pot_JoystickZ = 28,
-    button_zoomModeSwitch = 17
-
+    pot_JoystickZ = 28
 #ifdef EUCLIDEAN
     ,
-    pulse0=20,
-    pulse1=21,
-    pulse2=12,
-    pulse3=11,
-    pulse4=3,
-    pulse5=4,
-    pulse6=5
-#endif    
+    pulse0 = 20,
+    pulse1 = 21,
+    pulse2 = 12,
+    pulse3 = 11,
+    pulse4 = 3,
+    pulse5 = 4,
+    pulse6 = 5
+#endif
 };
 
 

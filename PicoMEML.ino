@@ -122,7 +122,7 @@ void AUDIO_FUNC(loop)() {
         // on core 1
         std::vector<float> audio_params(kN_synthparams);
         if (queue_try_remove(&queue_audioparam, audio_params.data())) {
-            Serial.println("A- Audio params received.");
+            //Serial.println("A- Audio params received.");
             AudioAppSetParams(audio_params);
         }
     }
@@ -162,7 +162,7 @@ void setup1() {
     Serial.println("Input Pins Set");
     // MLP setup
     mlp_init(&queue_audioparam,
-             sizeof(ts_joystick_read)/sizeof(float),
+             kAudioApp_NAnalysisParams,
              kN_synthparams);
 
     // Wait for init sync
@@ -175,6 +175,11 @@ void setup1() {
 void loop1() {
     // Read ADC
     ButtonsPots::Process();
+    // Get params from audio
+    std::vector<float> params;
+    AnalysisParamsRead(params);
+    // Send to MLP
+    mlp_inference(params);
 
     static constexpr uint32_t period_ms = 1;
     // Pulse

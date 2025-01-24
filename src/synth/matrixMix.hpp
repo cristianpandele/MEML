@@ -4,9 +4,13 @@
 #include <cassert>
 #include <vector>
 #include <array>
+#include <cmath>
 #include "maximilian.h"
 #include "OnePoleSmoother.hpp"
 #include "AudioSample.h"
+#include "../audio/AnalysisParams.hpp"
+#include "../interface/mlp_task.hpp"
+
 
 #define PERIODIC_DEBUG(COUNT, FUNC) \
         static size_t ct=0; \

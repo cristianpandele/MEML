@@ -30,13 +30,13 @@ class ButtonsPots {
     Add new buttons to this array to have them initialised
     automatically. */
     static constexpr enum PinConfig Buttons[] {
-        toggle_SaveData,
+        // toggle_SaveData,
         button_Randomise,
         toggle_Training,
-        button_ClearData,
+        // button_ClearData,
         button_ZoomOut,
         button_ZoomIn,
-        button_zoomModeSwitch
+        // button_zoomModeSwitch
     };
     /** Number of pins that are buttons */
     static constexpr size_t kNButtons = sizeof(Buttons)/sizeof(PinConfig);
