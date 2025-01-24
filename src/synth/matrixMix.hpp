@@ -14,7 +14,7 @@
             FUNC         \
         }
 
-const size_t kN_synthparams = 30;
+const size_t kN_synthparams = 5;
 
 inline float vox_fasttanh_ultra( const float x )
 {

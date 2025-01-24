@@ -7,7 +7,7 @@
 
 #include <vector>
 
-const size_t kAudioApp_NAnalysisParams = 1;
+const size_t kAudioApp_NAnalysisParams = 5;
 
 /**
  * @brief App setup routine, called on board power-up.
